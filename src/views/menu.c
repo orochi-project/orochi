@@ -41,7 +41,7 @@ void run_menu_loop(uint8_t *sprite_idx) {
                                        TEXT_ANCHOR_TOP, 1, *sprite_idx);
     *sprite_idx = draw_sprite_text_8x8(">", 140, 96, TEXT_ANCHOR_RIGHT,
                                        TEXT_ANCHOR_TOP, 1, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8("EASY", 140, 112, TEXT_ANCHOR_RIGHT,
+    *sprite_idx = draw_sprite_text_8x8("*++++", 140, 112, TEXT_ANCHOR_RIGHT,
                                        TEXT_ANCHOR_TOP, 0, *sprite_idx);
 
     /* This loop should eventually break on certain conditions.
