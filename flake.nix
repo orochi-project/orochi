@@ -93,6 +93,64 @@
         '';
       };
 
+      hugetracker = pkgs.stdenv.mkDerivation {
+        pname = "hugetracker";
+        version = "1.0.11";
+
+        src = pkgs.fetchzip {
+          url = "https://github.com/SuperDisk/hUGETracker/releases/download/v1.0.11/hUGETracker-1.0.11-linux.zip";
+          sha256 = "sha256-iTZU5N43mHHCSP0y/LgmEqo0YEDhDw/Th+h4bgGqb1k=";
+          stripRoot = false;
+        };
+
+        nativeBuildInputs = with pkgs; [
+          autoPatchelfHook
+          makeWrapper
+        ];
+
+        buildInputs = with pkgs; [
+          SDL2
+          libGL
+          zlib
+          stdenv.cc.cc.lib
+
+          gtk2
+          gdk-pixbuf
+          pango
+          cairo
+          atk
+          fontconfig
+          freetype
+
+          libx11
+          libxext
+          libxrender
+          libxcb
+          libxi
+          libxcursor
+          libxrandr
+        ];
+
+        installPhase = ''
+          mkdir -p $out/bin
+          mkdir -p $out/share/hugetracker
+
+          cp -r . $out/share/hugetracker
+
+          chmod +x $out/share/hugetracker/hUGETracker
+          chmod +x $out/share/hugetracker/uge2source
+
+          makeWrapper \
+            $out/share/hugetracker/hUGETracker \
+            $out/bin/hugetracker \
+            --add-flags "--runtime_dir $out/share/hugetracker"
+
+          makeWrapper \
+            $out/share/hugetracker/uge2source \
+            $out/bin/uge2source
+        '';
+      };
+
       bearConfig = pkgs.writeText "bear.yml" ''
         schema: "4.0"
         intercept:
@@ -110,6 +168,7 @@
         default = orochi;
         gbdk = gbdk;
         gb-tools = gb-tools;
+        hugetracker = hugetracker;
       };
 
       apps.default = {
@@ -127,12 +186,13 @@
 
         packages = [
           gbdk
+          hugetracker
+          make-with-bear
           pkgs.clang-tools
           pkgs.mbake
           pkgs.bear
           pkgs.gearboy
           pkgs.libresprite
-          make-with-bear
         ];
 
         shellHook = ''
