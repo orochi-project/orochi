@@ -33,7 +33,7 @@ void run_menu_loop(uint8_t *sprite_idx) {
 
     // TODO: This is a dummy level selector. This shall be replaced with a
     // working one later.
-    *sprite_idx = draw_sprite_text_8x8("LEVEL 1", 44, 80, TEXT_ANCHOR_LEFT,
+    *sprite_idx = draw_sprite_text_8x8("MAP 1", 44, 80, TEXT_ANCHOR_LEFT,
                                        TEXT_ANCHOR_TOP, 0, *sprite_idx);
     *sprite_idx = draw_sprite_text_8x8("<", 44, 96, TEXT_ANCHOR_LEFT,
                                        TEXT_ANCHOR_TOP, 1, *sprite_idx);

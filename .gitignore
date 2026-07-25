@@ -9,11 +9,7 @@ result
 # Single-user tooling configurations
 bear.yml
 compile_commands.json
+compile_commands.tmp
 
 # Single-user scripts
 scripts/.wslmake.sh
-
-# Compiled/converted resources
-# res/**/*.png
-# res/**/*.c
-# res/**/*.h
