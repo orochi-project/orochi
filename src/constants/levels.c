@@ -1,6 +1,5 @@
 #include "constants/levels.h"
 
-/** The list of levels in the game. */
 const struct Level levels[3] = {{
                                     .id = 1,
                                     .name = "Endless",
