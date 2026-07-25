@@ -35,9 +35,13 @@ void run_menu_loop(uint8_t *sprite_idx) {
     // working one later.
     *sprite_idx = draw_sprite_text_8x8("LEVEL 1", 44, 80, TEXT_ANCHOR_LEFT,
                                        TEXT_ANCHOR_TOP, 0, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8("NOM NOM >", 140, 96, TEXT_ANCHOR_RIGHT,
+    *sprite_idx = draw_sprite_text_8x8("<", 44, 96, TEXT_ANCHOR_LEFT,
                                        TEXT_ANCHOR_TOP, 1, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8("EASY", 44, 112, TEXT_ANCHOR_LEFT,
+    *sprite_idx = draw_sprite_text_8x8("ABCDEFGH", 92, 96, TEXT_ANCHOR_CENTER,
+                                       TEXT_ANCHOR_TOP, 1, *sprite_idx);
+    *sprite_idx = draw_sprite_text_8x8(">", 140, 96, TEXT_ANCHOR_RIGHT,
+                                       TEXT_ANCHOR_TOP, 1, *sprite_idx);
+    *sprite_idx = draw_sprite_text_8x8("EASY", 140, 112, TEXT_ANCHOR_RIGHT,
                                        TEXT_ANCHOR_TOP, 0, *sprite_idx);
 
     /* This loop should eventually break on certain conditions.
