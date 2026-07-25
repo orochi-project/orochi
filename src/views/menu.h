@@ -38,5 +38,7 @@ void slide_down_logo(uint8_t distance_y, uint8_t speed,
  * Run the menu loop.
  *
  * Modifies the sprite index in-place using a pointer.
+ *
+ * @param sprite_idx The starting sprite index (0-39).
  */
 void run_menu_loop(uint8_t *sprite_idx);

@@ -27,8 +27,18 @@ void run_menu_loop(uint8_t *sprite_idx) {
     // centered. The starting y-position of the logo is 0 because we want to
     // slide the logo down after.
     uint8_t initial_sprite_idx = *sprite_idx;
+
     *sprite_idx = draw_menu_logo(*sprite_idx, 52, 0);
     slide_down_logo(32, 6, initial_sprite_idx, *sprite_idx);
+
+    // TODO: This is a dummy level selector. This shall be replaced with a
+    // working one later.
+    *sprite_idx = draw_sprite_text_8x8("LEVEL 1", 44, 80, TEXT_ANCHOR_LEFT,
+                                       TEXT_ANCHOR_TOP, 0, *sprite_idx);
+    *sprite_idx = draw_sprite_text_8x8("NOM NOM >", 140, 96, TEXT_ANCHOR_RIGHT,
+                                       TEXT_ANCHOR_TOP, 1, *sprite_idx);
+    *sprite_idx = draw_sprite_text_8x8("EASY", 44, 112, TEXT_ANCHOR_LEFT,
+                                       TEXT_ANCHOR_TOP, 0, *sprite_idx);
 
     /* This loop should eventually break on certain conditions.
      * (For example, when the user enters a level.)
@@ -58,14 +68,15 @@ uint8_t draw_menu_logo(uint8_t sprite_idx, uint8_t start_x, uint8_t start_y) {
     uint8_t current_sprite = sprite_idx;
 
     current_sprite +=
-        move_metasprite_ex(orochi_jp_16x16_metasprites[0], FONT_2_BASE_TILE, 1,
+        move_metasprite_ex(orochi_jp_16x16_metasprites[0], FONT_2_BASE_TILE, 0,
                            current_sprite, start_x, start_y); // 大
     current_sprite += move_metasprite_ex(
-        orochi_jp_16x16_metasprites[1], FONT_2_BASE_TILE, 1, current_sprite,
+        orochi_jp_16x16_metasprites[1], FONT_2_BASE_TILE, 0, current_sprite,
         start_x + 16, start_y); // 蛇
                                 // +16 to next tile
     current_sprite = draw_sprite_text_8x8("OROCHI", start_x + 36, start_y - 4,
-                                          current_sprite, 1);
+                                          TEXT_ANCHOR_LEFT, TEXT_ANCHOR_TOP, 0,
+                                          current_sprite);
 
     return current_sprite;
 }
