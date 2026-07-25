@@ -29,30 +29,56 @@ endif
 
 LCCFLAGS += -Wm-yc # run on both DMG and CGB
 
-INCLUDES := -Isrc -Ires
+# Include the src/ and res/ directories
+INCLUDES := -Isrc -Ires -I$(BUILD)/generated
+
+LIBRESPRITE := libresprite
+PNG2ASSET := $(GBDK_HOME)/bin/png2asset
+
+include res/png2asset.mk
+
+RES_ASE := $(addprefix res/,$(addsuffix .ase,$(PNG2ASSET_ASSETS)))
+
+RES_GEN := $(addprefix $(BUILD)/generated/,$(PNG2ASSET_ASSETS))
+
+RES_C_GEN := $(addsuffix .c,$(RES_GEN))
+RES_H_GEN := $(addsuffix .h,$(RES_GEN))
+
+RES_C_DISK := $(shell find res -name '*.c' 2>/dev/null)
+RES_S := $(shell find res -name '*.s' 2>/dev/null)
+
+RES_C := $(sort $(RES_C_DISK) $(RES_C_GEN))
+RES_H := $(RES_H_GEN)
 
 SRC_C := $(shell find src -name '*.c' 2>/dev/null)
 SRC_S := $(shell find src -name '*.s' 2>/dev/null)
-RES_C := $(shell find res -name '*.c' 2>/dev/null)
-RES_S := $(shell find res -name '*.s' 2>/dev/null)
 
 OBJS := $(SRC_C:src/%.c=$(BUILD)/%.o) \
         $(SRC_S:src/%.s=$(BUILD)/%.o) \
-        $(RES_C:res/%.c=$(BUILD)/%.o) \
+        $(RES_C_DISK:res/%.c=$(BUILD)/%.o) \
+        $(RES_C_GEN:$(BUILD)/generated/%.c=$(BUILD)/generated/%.o) \
         $(RES_S:res/%.s=$(BUILD)/%.o)
 
 .PHONY: all run clean
 
-all: $(TARGET)
+GENERATED := $(RES_C) $(RES_H)
+
+all: $(GENERATED) $(TARGET)
 
 $(BUILD):
 	mkdir -p $(BUILD)
 
-$(BUILD)/%.o: src/%.c | $(BUILD)
+# Export .ase files to .png format
+build/generated/%.png: res/%.ase | $(BUILD)
 	@mkdir -p $(dir $@)
-	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
+	$(LIBRESPRITE) -b $< --save-as $@
 
-$(BUILD)/%.o: src/%.s | $(BUILD)
+# Compile .png files to .c and .h targets
+build/generated/%.c build/generated/%.h &: build/generated/%.png res/png2asset.mk
+	@mkdir -p $(dir $@)
+	$(PNG2ASSET) $< -c build/generated/$*.c $(PNG2ASSET_FLAGS/$*)
+
+$(BUILD)/%.o: src/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
 
@@ -60,7 +86,7 @@ $(BUILD)/%.o: res/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
 
-$(BUILD)/%.o: res/%.s | $(BUILD)
+$(BUILD)/generated/%.o: build/generated/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
 
