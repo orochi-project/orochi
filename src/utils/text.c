@@ -7,21 +7,26 @@
 #include <stdint.h>
 
 const palette_color_t text_accent_palette[4] = {
-    RGB8(232, 224, 208), RGB8(200, 32, 32), RGB8(0, 0, 0), RGB8(0, 0, 0)};
+    RGB8(0, 0, 0), RGB8(200, 32, 32), RGB8(0, 0, 0), RGB8(0, 0, 0)};
 
 const palette_color_t text_light_palette[4] = {
-    RGB8(232, 224, 208), RGB8(232, 224, 208), RGB8(0, 0, 0), RGB8(0, 0, 0)};
+    RGB8(0, 0, 0), RGB8(232, 224, 208), RGB8(0, 0, 0), RGB8(0, 0, 0)};
+
+void set_text_palettes(void) {
+    set_sprite_palette(0, 1, text_accent_palette);
+    set_sprite_palette(1, 1, text_light_palette);
+}
 
 void load_yarara_font_8x8(void) {
-    set_sprite_data(FONT_1_BASE_TILE, yarara_font_8x8_TILE_COUNT,
+    set_sprite_data(YARARA_FONT_8X8_BASE_TILE, yarara_font_8x8_TILE_COUNT,
                     yarara_font_8x8_tiles);
-    SET_TEXT_PALETTES();
+    set_text_palettes();
 }
 
 void load_orochi_jp_16x16(void) {
-    set_sprite_data(FONT_2_BASE_TILE, orochi_jp_16x16_TILE_COUNT,
+    set_sprite_data(OROCHI_JP_16X16_BASE_TILE, orochi_jp_16x16_TILE_COUNT,
                     orochi_jp_16x16_tiles);
-    SET_TEXT_PALETTES();
+    set_text_palettes();
 }
 
 uint8_t get_glyph_index(char character) {
@@ -91,25 +96,18 @@ uint8_t draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
 
     uint8_t text_width = text_length * 8;
 
-    switch (anchor_x) {
-    case TEXT_ANCHOR_CENTER:
+    // We do not need to handle TEXT_ANCHOR_LEFT because it is assumed to be the
+    // default when the x variable was initialized.
+    if (anchor_x == TEXT_ANCHOR_CENTER)
         x -= text_width / 2;
-        break;
-
-    case TEXT_ANCHOR_RIGHT:
+    else if (anchor_x == TEXT_ANCHOR_RIGHT)
         x -= text_width;
-        break;
-    }
 
-    switch (anchor_y) {
-    case TEXT_ANCHOR_MIDDLE:
+    // Likewise for TEXT_ANCHOR_TOP for the y variable
+    if (anchor_y == TEXT_ANCHOR_MIDDLE)
         y -= 4;
-        break;
-
-    case TEXT_ANCHOR_BOTTOM:
+    else if (anchor_y == TEXT_ANCHOR_BOTTOM)
         y -= 8;
-        break;
-    }
 
     for (uint8_t i = 0; text[i] != '\0' && current_sprite + 1 < 40; ++i) {
         uint8_t glyph_index = get_glyph_index(text[i]);
@@ -123,7 +121,7 @@ uint8_t draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
         glyph_index += glyph_index + 1;
 
         current_sprite += move_metasprite_ex(
-            yarara_font_8x8_metasprites[glyph_index], FONT_1_BASE_TILE,
+            yarara_font_8x8_metasprites[glyph_index], YARARA_FONT_8X8_BASE_TILE,
             palette_number, current_sprite, x, y);
 
         x += 8;

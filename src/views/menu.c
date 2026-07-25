@@ -71,13 +71,13 @@ void draw_menu_background(void) {
 uint8_t draw_menu_logo(uint8_t sprite_idx, uint8_t start_x, uint8_t start_y) {
     uint8_t current_sprite = sprite_idx;
 
-    current_sprite +=
-        move_metasprite_ex(orochi_jp_16x16_metasprites[0], FONT_2_BASE_TILE, 0,
-                           current_sprite, start_x, start_y); // 大
     current_sprite += move_metasprite_ex(
-        orochi_jp_16x16_metasprites[1], FONT_2_BASE_TILE, 0, current_sprite,
-        start_x + 16, start_y); // 蛇
-                                // +16 to next tile
+        orochi_jp_16x16_metasprites[0], OROCHI_JP_16X16_BASE_TILE, 0,
+        current_sprite, start_x, start_y); // 大
+    current_sprite += move_metasprite_ex(
+        orochi_jp_16x16_metasprites[1], OROCHI_JP_16X16_BASE_TILE, 0,
+        current_sprite, start_x + 16, start_y); // 蛇
+                                                // +16 to next tile
     current_sprite = draw_sprite_text_8x8("OROCHI", start_x + 36, start_y - 4,
                                           TEXT_ANCHOR_LEFT, TEXT_ANCHOR_TOP, 0,
                                           current_sprite);
