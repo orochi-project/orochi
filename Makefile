@@ -71,7 +71,7 @@ $(BUILD):
 # Export .ase files to .png format
 build/generated/%.png: res/%.ase | $(BUILD)
 	@mkdir -p $(dir $@)
-	$(LIBRESPRITE) -b $< --save-as $@
+	$(LIBRESPRITE) -b $(abspath $<) --save-as $(abspath $@)
 
 # Compile .png files to .c and .h targets
 build/generated/%.c build/generated/%.h &: build/generated/%.png res/png2asset.mk
