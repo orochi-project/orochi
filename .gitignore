@@ -2,3 +2,6 @@
 build/
 result
 scripts/.wslmake.sh
+.cache/
+bear.yml
+compile_commands.json

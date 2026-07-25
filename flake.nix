@@ -92,6 +92,19 @@
             --add-flags "$out/share/gb-tools/gbmb/gbmb.exe"
         '';
       };
+
+      bearConfig = pkgs.writeText "bear.yml" ''
+        schema: "4.0"
+        intercept:
+          mode: preload
+        compilers:
+          - path: ${gbdk}/bin/sdcc
+            as: gcc
+      '';
+
+      make-with-bear = pkgs.writeShellScriptBin "make" ''
+        exec ${pkgs.bear}/bin/bear --config bear.yml --append -- ${pkgs.gnumake}/bin/make "$@"
+      '';
     in {
       packages = {
         default = orochi;
@@ -115,15 +128,17 @@
         packages = [
           gbdk
           pkgs.clang-tools
-          pkgs.gnumake
           pkgs.mbake
+          pkgs.bear
           pkgs.gearboy
           pkgs.libresprite
+          make-with-bear
         ];
 
         shellHook = ''
           export GBDK_HOME=${gbdk}
           export PATH=$GBDK_HOME/bin:$PATH
+          ln -sf ${bearConfig} bear.yml
         '';
       };
     });
