@@ -138,9 +138,7 @@ uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
 
     const struct Level *level = &levels[level_idx];
 
-    // change Map 1 --> Map 2 etc, less resource heavy on gameboy than
-    // sprintf method
-    // for now we are assuming there are no more than 9 total levels
+    // for now we assume there are no more than 9 total levels
     char map_text[6] = "MAP _";
     map_text[4] = '1' + level_idx;
 

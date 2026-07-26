@@ -11,22 +11,6 @@ $(error HUGEDRIVER is not set.)
 endif
 
 LCC := $(GBDK_HOME)/bin/lcc
-GBLIB := $(GBDK_HOME)/lib/gb/gb.lib
-
-LINKOBJS := $(BUILD)/set_data.o \
-						$(BUILD)/sfr.o \
-						$(BUILD)/delay.o \
-						$(BUILD)/set_bk_t.o \
-						$(BUILD)/set_xy_t.o \
-						$(BUILD)/set_tile.o \
-						$(BUILD)/get_addr.o \
-						$(BUILD)/fill_rect.o \
-						$(BUILD)/fill_rect_bk.o \
-						$(BUILD)/cgb_palettes.o \
-						$(BUILD)/metasprites.o \
-						$(BUILD)/metasprites_hide_spr.o \
-						$(BUILD)/set_wi_t.o \
-						$(BUILD)/pad.o
 
 ifdef GBDK_DEBUG
 LCCFLAGS += -debug -v
@@ -96,11 +80,8 @@ $(BUILD)/generated/%.o: build/generated/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
 
-$(LINKOBJS): | $(BUILD)
-	ar x --output=$(BUILD) $(GBLIB) $(notdir $@)
-
-$(TARGET): $(OBJS) $(LINKOBJS)
-	$(LCC) $(LCCFLAGS) -o $@ $(OBJS) $(LINKOBJS)
+$(TARGET): $(OBJS)
+	$(LCC) $(LCCFLAGS) -o $@ $(OBJS) $(GBDK_HOME)/lib/gb/gb.lib $(GBDK_HOME)/lib/sm83/sm83.lib
 
 run: $(TARGET)
 	gearboy $(TARGET)
