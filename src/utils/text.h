@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fonts/yarara_font_8x8.h"
+#include "graphics/fonts/yarara_font_8x8.h"
 
 #include <gb/cgb.h>
 #include <stdbool.h>

@@ -137,7 +137,7 @@
           owner = "SuperDisk";
           repo = "hUGEDriver";
           rev = "v6.1.3";
-          hash = "sha256-iTZU5N43mHHCSP0y/LgmEqo0YEDhDw/Th+h4bgGqb1k=";
+          hash = "sha256-2zlsyXY5LnLUH3A99SJMq2pcfbolkc7YV7n8058EzP8=";
         };
 
         nativeBuildInputs = with pkgs; [
@@ -154,8 +154,7 @@
         ];
 
         buildPhase = ''
-          cd hUGEDriver
-          rgbasm -o hUGEDriver.obj hUGEDriver.asm
+          rgbasm -D GBDK -o hUGEDriver.obj hUGEDriver.asm
           python3 tools/rgb2sdas.py -o hUGEDriver.o hUGEDriver.obj
         '';
 

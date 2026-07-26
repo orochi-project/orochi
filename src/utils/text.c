@@ -1,6 +1,6 @@
 #include "text.h"
-#include "fonts/orochi_jp_16x16.h"
-#include "fonts/yarara_font_8x8.h"
+#include "graphics/fonts/orochi_jp_16x16.h"
+#include "graphics/fonts/yarara_font_8x8.h"
 
 #include <gb/gb.h>
 #include <gb/metasprites.h>

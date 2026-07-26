@@ -21,21 +21,26 @@ LCCFLAGS += -Wm-yc # run on both DMG and CGB
 # Include directories/paths
 INCLUDES := -Isrc -Ires -I$(BUILD)/generated -I$(HUGEDRIVER)/include
 
+# Command binaries
 LIBRESPRITE := libresprite
 PNG2ASSET := $(GBDK_HOME)/bin/png2asset
+UGE2SOURCE := uge2source
 
-include res/png2asset.mk
+include res/graphics/png2asset.mk
+include res/audio/uge2source.mk
 
-RES_ASE := $(addprefix res/,$(addsuffix .ase,$(PNG2ASSET_ASSETS)))
+GFX_ASE := $(addprefix res/graphics/,$(addsuffix .ase,$(PNG2ASSET_ASSETS)))
+GFX_GEN := $(addprefix $(BUILD)/generated/graphics/,$(PNG2ASSET_ASSETS))
+GFX_C_GEN := $(addsuffix .c,$(GFX_GEN))
+GFX_H_GEN := $(addsuffix .h,$(GFX_GEN))
 
-RES_GEN := $(addprefix $(BUILD)/generated/,$(PNG2ASSET_ASSETS))
-
-RES_C_GEN := $(addsuffix .c,$(RES_GEN))
-RES_H_GEN := $(addsuffix .h,$(RES_GEN))
+AUDIO_UGE := $(addprefix res/audio/,$(UGE2SOURCE_ASSETS))
+AUDIO_C_GEN := $(addprefix $(BUILD)/generated/audio/,$(UGE2SOURCE_ASSETS:%.uge=%.c))
 
 RES_C_DISK := $(shell find res -name '*.c' 2>/dev/null)
 RES_S := $(shell find res -name '*.s' 2>/dev/null)
-
+RES_C_GEN := $(GFX_C_GEN) $(AUDIO_C_GEN)
+RES_H_GEN := $(GFX_H_GEN)
 RES_C := $(sort $(RES_C_DISK) $(RES_C_GEN))
 RES_H := $(RES_H_GEN)
 
@@ -59,14 +64,19 @@ $(BUILD):
 	mkdir -p $(BUILD)
 
 # Export .ase files to .png format
-build/generated/%.png: res/%.ase | $(BUILD)
+$(BUILD)/generated/graphics/%.png: res/graphics/%.ase | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LIBRESPRITE) -b $(abspath $<) --save-as $(abspath $@)
 
-# Compile .png files to .c and .h targets
-build/generated/%.c build/generated/%.h &: build/generated/%.png res/png2asset.mk
+# Convert .png files to .c and .h
+$(BUILD)/generated/graphics/%.c $(BUILD)/generated/graphics/%.h &: $(BUILD)/generated/graphics/%.png res/graphics/png2asset.mk
 	@mkdir -p $(dir $@)
-	$(PNG2ASSET) $< -c build/generated/$*.c $(PNG2ASSET_FLAGS/$*)
+	$(PNG2ASSET) $< -c $(BUILD)/generated/graphics/$*.c $(PNG2ASSET_FLAGS/$*)
+
+# Export .uge files to .c
+$(BUILD)/generated/audio/%.c: res/audio/%.uge | $(BUILD)
+	@mkdir -p $(dir $@)
+	$(UGE2SOURCE) $< $(notdir $(basename $<)) $@
 
 $(BUILD)/%.o: src/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
@@ -76,7 +86,7 @@ $(BUILD)/%.o: res/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
 
-$(BUILD)/generated/%.o: build/generated/%.c | $(BUILD)
+$(BUILD)/generated/%.o: $(BUILD)/generated/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
 	$(LCC) $(LCCFLAGS) $(INCLUDES) -c -o $@ $<
 

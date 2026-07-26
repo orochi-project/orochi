@@ -1,7 +1,7 @@
 #include "views/menu.h"
-#include "backgrounds/menu_background.h"
 #include "constants/levels.h"
-#include "fonts/orochi_jp_16x16.h"
+#include "graphics/backgrounds/menu_background.h"
+#include "graphics/fonts/orochi_jp_16x16.h"
 #include "utils/text.h"
 
 #include <gb/gb.h>
