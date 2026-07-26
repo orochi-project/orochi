@@ -62,36 +62,10 @@
         '';
       };
 
-      gbtd-gbmb-src = pkgs.fetchzip {
-        name = "gbtd-gbmb";
-        url = "https://github.com/gbdk-2020/GBTD_GBMB/releases/download/2.4.5/GBTD_GBMB_release.zip";
-        sha256 = "sha256-zLb5y4DnrYoGmOqr+oc4Id60O3CdF2Xx5qKzy9BeBYM=";
-        stripRoot = false;
-      };
-
-      gb-tools = pkgs.stdenvNoCC.mkDerivation {
-        pname = "gbtd-gbmb";
-        version = "2.4.5";
-
-        src = gbtd-gbmb-src;
-
-        nativeBuildInputs = [pkgs.makeWrapper];
-
-        installPhase = ''
-          mkdir -p $out/share/gb-tools/gbtd $out/share/gb-tools/gbmb
-
-          cp -r GBTD/* $out/share/gb-tools/gbtd/
-          cp -r GBMB/* $out/share/gb-tools/gbmb/
-
-          mkdir -p $out/bin
-
-          makeWrapper ${pkgs.wine-wayland}/bin/wine $out/bin/gbtd \
-            --add-flags "$out/share/gb-tools/gbtd/gbtd.exe"
-
-          makeWrapper ${pkgs.wine-wayland}/bin/wine $out/bin/gbmb \
-            --add-flags "$out/share/gb-tools/gbmb/gbmb.exe"
-        '';
-      };
+      hugetrackerGtk2Rc = pkgs.writeText "hugetracker-gtkrc-2.0" ''
+        gtk-theme-name = "Materia-dark"
+        include "${pkgs.materia-theme}/share/themes/Materia-dark/gtk-2.0/gtkrc"
+      '';
 
       hugetracker = pkgs.stdenv.mkDerivation {
         pname = "hugetracker";
@@ -129,6 +103,8 @@
           libxi
           libxcursor
           libxrandr
+
+          gtk-engine-murrine
         ];
 
         installPhase = ''
@@ -143,11 +119,50 @@
           makeWrapper \
             $out/share/hugetracker/hUGETracker \
             $out/bin/hugetracker \
-            --add-flags "--runtime_dir $out/share/hugetracker"
+            --add-flags "--runtime_dir $out/share/hugetracker" \
+            --set GTK2_RC_FILES "${hugetrackerGtk2Rc}" \
+            --set GTK_PATH "${pkgs.gtk-engine-murrine}"
 
           makeWrapper \
             $out/share/hugetracker/uge2source \
             $out/bin/uge2source
+        '';
+      };
+
+      hugedriver = pkgs.stdenv.mkDerivation {
+        pname = "hugedriver";
+        version = "6.1.3";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "SuperDisk";
+          repo = "hUGEDriver";
+          rev = "v6.1.3";
+          hash = "sha256-iTZU5N43mHHCSP0y/LgmEqo0YEDhDw/Th+h4bgGqb1k=";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          (rgbds.overrideAttrs (old: {
+            version = "0.6.1";
+            src = fetchFromGitHub {
+              owner = "gbdev";
+              repo = "rgbds";
+              rev = "v0.6.1";
+              hash = "sha256-3mx4yymrOQnP5aJCzPWl5G96WBxt1ixU6tdzhhOsF04=";
+            };
+          }))
+          python3
+        ];
+
+        buildPhase = ''
+          cd hUGEDriver
+          rgbasm -o hUGEDriver.obj hUGEDriver.asm
+          python3 tools/rgb2sdas.py -o hUGEDriver.o hUGEDriver.obj
+        '';
+
+        installPhase = ''
+          mkdir -p $out/include $out/lib
+          cp include/hUGEDriver.h $out/include/
+          cp hUGEDriver.o $out/lib/
         '';
       };
 
@@ -160,15 +175,15 @@
             as: gcc
       '';
 
-      make-with-bear = pkgs.writeShellScriptBin "make" ''
+      makeWithBear = pkgs.writeShellScriptBin "make" ''
         exec ${pkgs.bear}/bin/bear --config bear.yml --append -- ${pkgs.gnumake}/bin/make "$@"
       '';
     in {
       packages = {
         default = orochi;
         gbdk = gbdk;
-        gb-tools = gb-tools;
         hugetracker = hugetracker;
+        hugedriver = hugedriver;
       };
 
       apps.default = {
@@ -179,15 +194,11 @@
       };
 
       devShells.default = pkgs.mkShell {
-        buildInputs = [
-          gb-tools
-          pkgs.wine-wayland
-        ];
-
         packages = [
           gbdk
           hugetracker
-          make-with-bear
+          hugedriver
+          makeWithBear
           pkgs.clang-tools
           pkgs.mbake
           pkgs.bear
@@ -197,7 +208,7 @@
 
         shellHook = ''
           export GBDK_HOME=${gbdk}
-          export PATH=$GBDK_HOME/bin:$PATH
+          export HUGEDRIVER=${hugedriver}
           ln -sf ${bearConfig} bear.yml
         '';
       };

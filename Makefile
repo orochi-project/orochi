@@ -6,6 +6,10 @@ ifndef GBDK_HOME
 $(error GBDK_HOME is not set.)
 endif
 
+ifndef HUGEDRIVER
+$(error HUGEDRIVER is not set.)
+endif
+
 LCC := $(GBDK_HOME)/bin/lcc
 GBLIB := $(GBDK_HOME)/lib/gb/gb.lib
 
@@ -29,8 +33,8 @@ endif
 
 LCCFLAGS += -Wm-yc # run on both DMG and CGB
 
-# Include the src/ and res/ directories
-INCLUDES := -Isrc -Ires -I$(BUILD)/generated
+# Include directories/paths
+INCLUDES := -Isrc -Ires -I$(BUILD)/generated -I$(HUGEDRIVER)/include
 
 LIBRESPRITE := libresprite
 PNG2ASSET := $(GBDK_HOME)/bin/png2asset
@@ -57,7 +61,8 @@ OBJS := $(SRC_C:src/%.c=$(BUILD)/%.o) \
         $(SRC_S:src/%.s=$(BUILD)/%.o) \
         $(RES_C_DISK:res/%.c=$(BUILD)/%.o) \
         $(RES_C_GEN:$(BUILD)/generated/%.c=$(BUILD)/generated/%.o) \
-        $(RES_S:res/%.s=$(BUILD)/%.o)
+        $(RES_S:res/%.s=$(BUILD)/%.o) \
+        $(HUGEDRIVER)/lib/hUGEDriver.o
 
 .PHONY: all run clean
 
