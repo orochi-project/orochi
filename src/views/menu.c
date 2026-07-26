@@ -2,6 +2,7 @@
 #include "backgrounds/menu_background.h"
 #include "fonts/orochi_jp_16x16.h"
 #include "utils/text.h"
+#include "constants/levels.h"
 
 #include <gb/gb.h>
 #include <gb/hardware.h>
@@ -23,36 +24,72 @@ void load_menu(void) {
 void run_menu_loop(uint8_t *sprite_idx) {
     draw_menu_background();
 
-    // The starting x-position is 52, which allows the logo to be properly
-    // centered. The starting y-position of the logo is 0 because we want to
-    // slide the logo down after.
     uint8_t initial_sprite_idx = *sprite_idx;
 
     *sprite_idx = draw_menu_logo(*sprite_idx, 52, 0);
     slide_down_logo(32, 6, initial_sprite_idx, *sprite_idx);
 
-    // TODO: This is a dummy level selector. This shall be replaced with a
-    // working one later.
-    *sprite_idx = draw_sprite_text_8x8("MAP 1", 44, 80, TEXT_ANCHOR_LEFT,
-                                       TEXT_ANCHOR_TOP, 0, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8("<", 44, 96, TEXT_ANCHOR_LEFT,
-                                       TEXT_ANCHOR_TOP, 1, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8("ABCDEFGH", 92, 96, TEXT_ANCHOR_CENTER,
-                                       TEXT_ANCHOR_TOP, 1, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8(">", 140, 96, TEXT_ANCHOR_RIGHT,
-                                       TEXT_ANCHOR_TOP, 1, *sprite_idx);
-    *sprite_idx = draw_sprite_text_8x8("*++++", 140, 112, TEXT_ANCHOR_RIGHT,
-                                       TEXT_ANCHOR_TOP, 0, *sprite_idx);
+    uint8_t current_map = 0;
+    uint8_t menu_start = *sprite_idx;
+    
+    //Initial level (level 1). Returns next free sprite location as menu end.
+    uint8_t menu_end = draw_new_level_selected(menu_start, menu_start, current_map);
 
-    /* This loop should eventually break on certain conditions.
-     * (For example, when the user enters a level.)
-     *
-     * Omitted for now because there is nothing to loop at the moment. And, of
-     * course, we do want the function to return.
-     */
-    // while (1) {
-    //     vsync();
-    // }
+    uint8_t prev_joy = 0;
+
+    while (1) {
+        uint8_t joy = joypad();
+
+        //Bit logic: Pressed is only true the first time you press; prevents holding & accidental spam.
+        uint8_t pressed = joy & ~prev_joy;
+
+        if ((pressed & J_RIGHT) && (current_map < levels_length - 1)) {
+            current_map++;
+            menu_end = draw_new_level_selected(menu_start, menu_end, current_map);
+        }
+        if ((pressed & J_LEFT) && (current_map > 0)) {
+            current_map += -1;
+            menu_end = draw_new_level_selected(menu_start, menu_end, current_map);
+        }
+
+        prev_joy = joy;
+        vsync();
+    }
+}
+
+uint8_t draw_new_level_selected(uint8_t menu_sprite_start, uint8_t menu_sprite_end, uint8_t level_to_draw) {
+    
+    //hides the previous level selection sprites so new ones can be drawn
+    hide_sprites_range(menu_sprite_start, menu_sprite_end);
+
+    uint8_t sprite_idx = menu_sprite_start;
+
+    //change Map 1 --> Map 2 etc, less resource heavy on gameboy than normal method
+    char current_level_map[8];
+    current_level_map[0] = 'M';
+    current_level_map[1] = 'A';
+    current_level_map[2] = 'P';
+    current_level_map[3] = ' ';
+    current_level_map[4] = '0' + (level_to_draw + 1);
+    current_level_map[5] = '\0';
+
+    sprite_idx = draw_sprite_text_8x8(current_level_map, 44, 80, TEXT_ANCHOR_LEFT,
+                                       TEXT_ANCHOR_TOP, 0, sprite_idx);
+
+    sprite_idx = draw_sprite_text_8x8("<", 44, 96, TEXT_ANCHOR_LEFT,
+                                       TEXT_ANCHOR_TOP, 1, sprite_idx);
+
+    sprite_idx = draw_sprite_text_8x8(levels[level_to_draw].name, 92, 96,
+                                       TEXT_ANCHOR_CENTER, TEXT_ANCHOR_TOP,
+                                       1, sprite_idx);
+
+    sprite_idx = draw_sprite_text_8x8(">", 140, 96, TEXT_ANCHOR_RIGHT,
+                                       TEXT_ANCHOR_TOP, 1, sprite_idx);
+
+    sprite_idx = draw_sprite_text_8x8(levels[level_to_draw].difficulty, 140, 112, TEXT_ANCHOR_RIGHT,
+                                       TEXT_ANCHOR_TOP, 0, sprite_idx);
+
+    return sprite_idx;
 }
 
 void load_menu_background(void) {

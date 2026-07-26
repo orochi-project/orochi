@@ -42,3 +42,14 @@ void slide_down_logo(uint8_t distance_y, uint8_t speed,
  * @param sprite_idx The starting sprite index (0-39).
  */
 void run_menu_loop(uint8_t *sprite_idx);
+
+/**
+ * Level selection: Draws the current level selected onto the screen. 
+ 
+ * Removes old sprites and draws new ones in its place.
+ 
+ * @param menu_sprite_start Where to start drawing the sprite
+ * @param menu_sprite_end Where the sprite drawing ends. Combined with hide_sprite_range(), removes old sprites.
+ * @param level_to_draw What level should be retrieved through the levels struct and displayed on screen.
+ */
+uint8_t draw_new_level_selected(uint8_t menu_sprite_start, uint8_t menu_sprite_end, uint8_t level_to_draw);
