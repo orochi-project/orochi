@@ -1,7 +1,7 @@
 #include "constants/levels.h"
 
 const struct Level levels[LEVEL_COUNT] = {{
-                                              .name = "Endless",
+                                              .name = "Resurrect",
                                               .difficulty = 1,
                                           },
                                           {

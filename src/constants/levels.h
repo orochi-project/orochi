@@ -8,7 +8,7 @@
 /** A structure representing a single level/map. */
 struct Level {
     uint8_t id;         ///< The level ID/number.
-    char name[9];       ///< The name of the level (maximum: 8 characters).
+    char name[11];      ///< The name of the level (maximum: 10 characters).
     uint8_t difficulty; ///< The difficulty of the level (1-5).
     // name and difficulty has +1 than what is needed for \0 room.
 };

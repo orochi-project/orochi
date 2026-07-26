@@ -149,14 +149,8 @@ uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
     draw_sprite_text_8x8(map_text, 44, 80, TEXT_ANCHOR_LEFT, TEXT_ANCHOR_TOP, 0,
                          &current_sprite);
 
-    draw_sprite_text_8x8("<", 44, 96, TEXT_ANCHOR_LEFT, TEXT_ANCHOR_TOP, 1,
-                         &current_sprite);
-
     draw_sprite_text_8x8(level->name, 92, 96, TEXT_ANCHOR_CENTER,
                          TEXT_ANCHOR_TOP, 1, &current_sprite);
-
-    draw_sprite_text_8x8(">", 140, 96, TEXT_ANCHOR_RIGHT, TEXT_ANCHOR_TOP, 1,
-                         &current_sprite);
 
     draw_sprite_text_8x8(difficulty_text, 140, 112, TEXT_ANCHOR_RIGHT,
                          TEXT_ANCHOR_TOP, 0, &current_sprite);
