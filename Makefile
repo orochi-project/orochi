@@ -25,7 +25,8 @@ LINKOBJS := $(BUILD)/set_data.o \
 						$(BUILD)/cgb_palettes.o \
 						$(BUILD)/metasprites.o \
 						$(BUILD)/metasprites_hide_spr.o \
-						$(BUILD)/set_wi_t.o
+						$(BUILD)/set_wi_t.o \
+						$(BUILD)/pad.o
 
 ifdef GBDK_DEBUG
 LCCFLAGS += -debug -v

@@ -81,11 +81,9 @@ uint8_t get_glyph_index(char character) {
     return index;
 }
 
-uint8_t draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
-                             TEXT_ANCHOR_X anchor_x, TEXT_ANCHOR_Y anchor_y,
-                             uint8_t palette_number, uint8_t sprite_idx) {
-    uint8_t current_sprite = sprite_idx;
-
+void draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
+                          TEXT_ANCHOR_X anchor_x, TEXT_ANCHOR_Y anchor_y,
+                          uint8_t palette_number, uint8_t *sprite_idx) {
     uint8_t x = start_x;
     uint8_t y = start_y;
 
@@ -109,7 +107,7 @@ uint8_t draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
     else if (anchor_y == TEXT_ANCHOR_BOTTOM)
         y -= 8;
 
-    for (uint8_t i = 0; text[i] != '\0' && current_sprite + 1 < 40; ++i) {
+    for (uint8_t i = 0; text[i] != '\0' && *sprite_idx + 1 < 40; ++i) {
         uint8_t glyph_index = get_glyph_index(text[i]);
 
         // Treat unmapped characters as spaces
@@ -120,12 +118,10 @@ uint8_t draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
 
         glyph_index += glyph_index + 1;
 
-        current_sprite += move_metasprite_ex(
+        *sprite_idx += move_metasprite_ex(
             yarara_font_8x8_metasprites[glyph_index], YARARA_FONT_8X8_BASE_TILE,
-            palette_number, current_sprite, x, y);
+            palette_number, *sprite_idx, x, y);
 
         x += 8;
     }
-
-    return current_sprite; // next free sprite index
 }

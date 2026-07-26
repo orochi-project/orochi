@@ -1,22 +1,15 @@
 #include "constants/levels.h"
 
-const struct Level levels[levels_length] = {{
-                                    .id = 1,
-                                    .name = "Endless",
-                                    .difficulty = "*++++",
-                                },
-                                {
-                                    .id = 2,
-                                    .name = "Stardust",
-                                    .difficulty = "**+++",
-                                },
-                                {
-                                    .id = 3,
-                                    .name = "Inertia",
-                                    .difficulty = "***++",
-                                },
-                                {
-                                    .id = 4,
-                                    .name = "Nom",
-                                    .difficulty = "*****"
-                                }};
+const struct Level levels[LEVEL_COUNT] = {{
+                                              .name = "Endless",
+                                              .difficulty = 1,
+                                          },
+                                          {
+                                              .name = "Stardust",
+                                              .difficulty = 2,
+                                          },
+                                          {
+                                              .name = "Inertia",
+                                              .difficulty = 3,
+                                          },
+                                          {.name = "Nom", .difficulty = 5}};

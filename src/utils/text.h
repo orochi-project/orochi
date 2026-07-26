@@ -8,7 +8,7 @@
 
 /** The first VRAM tile to load the 8x8 Yarara Font sprites onto. */
 #define YARARA_FONT_8X8_BASE_TILE 1
-/** The first VRAM tile to load the 16x16 Orochi Kanji sprites onto. */
+/** The first VRAM tile to load the 16x16 Orochi kanji sprites onto. */
 #define OROCHI_JP_16X16_BASE_TILE                                              \
     (YARARA_FONT_8X8_BASE_TILE + yarara_font_8x8_TILE_COUNT + 1)
 
@@ -75,7 +75,7 @@ uint8_t get_glyph_index(char character);
 /**
  * Draw text with the 8x8 Yarara Font using hardware sprites.
  *
- * Returns the next free sprite index after drawing the text.
+ * Modifies the sprite index to the next free tile after drawing.
  *
  * @param text          The string of text to draw onto the sprite layer.
  * @param start_x       The x-position of the text, anchored on the left/right.
@@ -87,6 +87,6 @@ uint8_t get_glyph_index(char character);
  * @param palette       The palette number to use for the text.
  * @param sprite_idx    The starting sprite index (0-39).
  */
-uint8_t draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
-                             TEXT_ANCHOR_X anchor_x, TEXT_ANCHOR_Y anchor_y,
-                             uint8_t palette_number, uint8_t sprite_idx);
+void draw_sprite_text_8x8(const char *text, uint8_t start_x, uint8_t start_y,
+                          TEXT_ANCHOR_X anchor_x, TEXT_ANCHOR_Y anchor_y,
+                          uint8_t palette_number, uint8_t *sprite_idx);
