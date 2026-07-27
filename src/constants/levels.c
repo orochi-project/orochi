@@ -12,4 +12,4 @@ const struct Level levels[LEVEL_COUNT] = {{
                                               .name = "Inertia",
                                               .difficulty = 3,
                                           },
-                                          {.name = "Nom", .difficulty = 5}};
+                                          {.name = "Isolation", .difficulty = 5}};
