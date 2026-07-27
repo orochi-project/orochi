@@ -18,6 +18,18 @@ endif
 
 LCCFLAGS += -Wm-yc # run on both DMG and CGB
 
+# The Memory Bank Controller 5 is a cartridge chip
+# that lets the Game Boy run games larger than 32 KB.
+LCCFLAGS += -Wm-yt0x19
+
+# We could just make this -Wm-yoA for automatic bank
+# sizing, but it would probably be better to keep it
+# predictable and change it as needed.
+#
+# (For now, it's set to 8 ROM banks, which is enough
+# for our purposes.)
+LCCFLAGS += -Wm-yo8
+
 # Include directories/paths
 INCLUDES := -Isrc -Ires -I$(BUILD)/generated -I$(HUGEDRIVER)/include
 
@@ -73,10 +85,18 @@ $(BUILD)/generated/graphics/%.c $(BUILD)/generated/graphics/%.h &: $(BUILD)/gene
 	@mkdir -p $(dir $@)
 	$(PNG2ASSET) $< -c $(BUILD)/generated/graphics/$*.c $(PNG2ASSET_FLAGS/$*)
 
-# Export .uge files to .c
+# Export .uge files to .c dynamically
 $(BUILD)/generated/audio/%.c: res/audio/%.uge | $(BUILD)
+	$(if $(UGE2SOURCE_BANK/$*.uge),,$(error UGE2SOURCE_BANK/$*.uge is missing in uge2source.mk! Please enforce a bank assignment))
 	@mkdir -p $(dir $@)
-	$(UGE2SOURCE) $< $(notdir $(basename $<)) $@
+	@echo '#include <gb/gb.h>' > $@
+	# @echo '#include <hUGEDriver.h>' >> $@
+	@echo '#pragma bank $(UGE2SOURCE_BANK/$*.uge)' >> $@
+	# @echo '#pragma constseg _CODE_$(UGE2SOURCE_BANK/$*.uge)' >> $@
+	$(UGE2SOURCE) $< $(notdir $(basename $<)) $(BUILD)/generated/audio/tmp_song.c
+	@cat $(BUILD)/generated/audio/tmp_song.c >> $@
+	@echo 'BANKREF($(notdir $(basename $<)))' >> $@
+	@rm $(BUILD)/generated/audio/tmp_song.c
 
 $(BUILD)/%.o: src/%.c | $(BUILD)
 	@mkdir -p $(dir $@)
