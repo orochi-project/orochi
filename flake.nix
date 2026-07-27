@@ -62,41 +62,127 @@
         '';
       };
 
-      gbtd-gbmb-src = pkgs.fetchzip {
-        name = "gbtd-gbmb";
-        url = "https://github.com/gbdk-2020/GBTD_GBMB/releases/download/2.4.5/GBTD_GBMB_release.zip";
-        sha256 = "sha256-zLb5y4DnrYoGmOqr+oc4Id60O3CdF2Xx5qKzy9BeBYM=";
-        stripRoot = false;
-      };
+      hugetrackerGtk2Rc = pkgs.writeText "hugetracker-gtkrc-2.0" ''
+        gtk-theme-name = "Materia-dark"
+        include "${pkgs.materia-theme}/share/themes/Materia-dark/gtk-2.0/gtkrc"
+      '';
 
-      gb-tools = pkgs.stdenvNoCC.mkDerivation {
-        pname = "gbtd-gbmb";
-        version = "2.4.5";
+      hugetracker = pkgs.stdenv.mkDerivation {
+        pname = "hugetracker";
+        version = "1.0.11";
 
-        src = gbtd-gbmb-src;
+        src = pkgs.fetchzip {
+          url = "https://github.com/SuperDisk/hUGETracker/releases/download/v1.0.11/hUGETracker-1.0.11-linux.zip";
+          sha256 = "sha256-iTZU5N43mHHCSP0y/LgmEqo0YEDhDw/Th+h4bgGqb1k=";
+          stripRoot = false;
+        };
 
-        nativeBuildInputs = [pkgs.makeWrapper];
+        nativeBuildInputs = with pkgs; [
+          autoPatchelfHook
+          makeWrapper
+        ];
+
+        buildInputs = with pkgs; [
+          SDL2
+          libGL
+          zlib
+          stdenv.cc.cc.lib
+
+          gtk2
+          gdk-pixbuf
+          pango
+          cairo
+          atk
+          fontconfig
+          freetype
+
+          libx11
+          libxext
+          libxrender
+          libxcb
+          libxi
+          libxcursor
+          libxrandr
+
+          gtk-engine-murrine
+        ];
 
         installPhase = ''
-          mkdir -p $out/share/gb-tools/gbtd $out/share/gb-tools/gbmb
-
-          cp -r GBTD/* $out/share/gb-tools/gbtd/
-          cp -r GBMB/* $out/share/gb-tools/gbmb/
-
           mkdir -p $out/bin
+          mkdir -p $out/share/hugetracker
 
-          makeWrapper ${pkgs.wine-wayland}/bin/wine $out/bin/gbtd \
-            --add-flags "$out/share/gb-tools/gbtd/gbtd.exe"
+          cp -r . $out/share/hugetracker
 
-          makeWrapper ${pkgs.wine-wayland}/bin/wine $out/bin/gbmb \
-            --add-flags "$out/share/gb-tools/gbmb/gbmb.exe"
+          chmod +x $out/share/hugetracker/hUGETracker
+          chmod +x $out/share/hugetracker/uge2source
+
+          makeWrapper \
+            $out/share/hugetracker/hUGETracker \
+            $out/bin/hugetracker \
+            --add-flags "--runtime_dir $out/share/hugetracker" \
+            --set GTK2_RC_FILES "${hugetrackerGtk2Rc}" \
+            --set GTK_PATH "${pkgs.gtk-engine-murrine}"
+
+          makeWrapper \
+            $out/share/hugetracker/uge2source \
+            $out/bin/uge2source
         '';
       };
+
+      hugedriver = pkgs.stdenv.mkDerivation {
+        pname = "hugedriver";
+        version = "6.1.3";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "SuperDisk";
+          repo = "hUGEDriver";
+          rev = "v6.1.3";
+          hash = "sha256-2zlsyXY5LnLUH3A99SJMq2pcfbolkc7YV7n8058EzP8=";
+        };
+
+        nativeBuildInputs = with pkgs; [
+          (rgbds.overrideAttrs (old: {
+            version = "0.6.1";
+            src = fetchFromGitHub {
+              owner = "gbdev";
+              repo = "rgbds";
+              rev = "v0.6.1";
+              hash = "sha256-3mx4yymrOQnP5aJCzPWl5G96WBxt1ixU6tdzhhOsF04=";
+            };
+          }))
+          python3
+        ];
+
+        buildPhase = ''
+          rgbasm -D GBDK -o hUGEDriver.obj hUGEDriver.asm
+          python3 tools/rgb2sdas.py -o hUGEDriver.o hUGEDriver.obj
+        '';
+
+        installPhase = ''
+          mkdir -p $out/include $out/lib
+          cp include/hUGEDriver.h $out/include/
+          cp hUGEDriver.o $out/lib/
+        '';
+      };
+
+      bearConfig = pkgs.writeText "bear.yml" ''
+        schema: "4.0"
+        intercept:
+          mode: preload
+        compilers:
+          - path: ${gbdk}/bin/sdcc
+            as: gcc
+      '';
+
+      makeWithBear = pkgs.writeShellScriptBin "make" ''
+        exec ${pkgs.bear}/bin/bear --config bear.yml --append -- ${pkgs.gnumake}/bin/make "$@"
+      '';
     in {
       packages = {
         default = orochi;
         gbdk = gbdk;
-        gb-tools = gb-tools;
+        hugetracker = hugetracker;
+        hugedriver = hugedriver;
       };
 
       apps.default = {
@@ -107,23 +193,22 @@
       };
 
       devShells.default = pkgs.mkShell {
-        buildInputs = [
-          gb-tools
-          pkgs.wine-wayland
-        ];
-
         packages = [
           gbdk
+          hugetracker
+          hugedriver
+          makeWithBear
           pkgs.clang-tools
-          pkgs.gnumake
           pkgs.mbake
+          pkgs.bear
           pkgs.gearboy
           pkgs.libresprite
         ];
 
         shellHook = ''
           export GBDK_HOME=${gbdk}
-          export PATH=$GBDK_HOME/bin:$PATH
+          export HUGEDRIVER=${hugedriver}
+          ln -sf ${bearConfig} bear.yml
         '';
       };
     });

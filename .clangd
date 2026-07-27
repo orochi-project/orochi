@@ -1,6 +1,11 @@
 CompileFlags:
-  Remove: ["-W*", "-Winvalid-pch"]
-Index:
-  Background: Skip
-Diagnostics:
-  Suppress: "*"
+  Add:
+    - -fsigned-char
+    - -ffreestanding
+  Remove:
+    - -msm83
+    - --no-std-crt0
+    - --fsigned-char
+    - --use-stdout
+    - --no-optsdcc-in-asm
+    - -Wa-pogN

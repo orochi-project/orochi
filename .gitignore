@@ -1,4 +1,15 @@
+# Cache
+.cache/
 .direnv/
+
+# Built files
 build/
 result
+
+# Single-user tooling configurations
+bear.yml
+compile_commands.json
+compile_commands.tmp
+
+# Single-user scripts
 scripts/.wslmake.sh
