@@ -10,7 +10,7 @@
  *
  * From /res/audio/soundtrack/menu/menu_loop.uge
  */
-extern const hUGESong_t menu_loop;
+extern const hUGESong_t isolation;
 
 void main(void) {
     uint8_t current_sprite = 0;
@@ -20,7 +20,7 @@ void main(void) {
     NR51_REG = 0xFF; // enable sound
                      //
     CRITICAL {
-        hUGE_init(&menu_loop);
+        hUGE_init(&isolation);
         add_VBL(hUGE_dosound);
     }
 
