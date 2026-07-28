@@ -49,10 +49,10 @@ uint8_t get_glyph_index(char character) {
         case '?':
             index = 38;
             break;
-        case '\\':
+        case '/':
             index = 39;
             break;
-        case '=':
+        case '-':
             index = 40;
             break;
         case ',':
@@ -72,6 +72,15 @@ uint8_t get_glyph_index(char character) {
             break;
         case '*':
             index = 46;
+            break;
+        case '~': // 千
+            index = 47;
+            break;
+        case '@': // 本
+            index = 48;
+            break;
+        case '#': // 桜
+            index = 49;
             break;
         default:
             return 0xFF;
