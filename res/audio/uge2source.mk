@@ -2,9 +2,11 @@
 # Paths should be relative to res/audio/.
 # Please keep this list sorted in alphabetical order.
 UGE2SOURCE_ASSETS := \
-    soundtrack/levels/05_isolation/isolation.uge
+    soundtrack/levels/03_senbonzakura/senbonzakura.uge \
+    soundtrack/levels/04_isolation/isolation.uge
 
 # Per-asset uge2source bank assignments, keyed by path relative to res/audio/.
 # Add one line per .uge file that needs assignment.
 # Please keep this list sorted in alphabetical order.
-UGE2SOURCE_BANK/soundtrack/levels/05_isolation/isolation.uge := 2
+UGE2SOURCE_BANK/soundtrack/levels/03_senbonzakura/senbonzakura.uge := 2
+UGE2SOURCE_BANK/soundtrack/levels/04_isolation/isolation.uge := 3

@@ -5,8 +5,8 @@
 #include "hUGEDriver.h"
 #include "views/menu.h"
 
-extern const hUGESong_t isolation;
-BANKREF_EXTERN(isolation) // external ref to the bank with the track
+extern const hUGESong_t senbonzakura;
+BANKREF_EXTERN(senbonzakura) // external ref to the bank with the track
 
 /**
  * The currently selected audio bank.
@@ -58,13 +58,13 @@ void main(void) {
     add_VBL(play_sound_vbl);
 
     CRITICAL {
-        uint8_t song_bank = BANK(isolation);
+        uint8_t song_bank = BANK(senbonzakura);
         current_audio_bank = song_bank;
 
         uint8_t _previous_bank = _current_bank;
 
         SWITCH_ROM(song_bank);
-        hUGE_init(&isolation);
+        hUGE_init(&senbonzakura);
         SWITCH_ROM(_previous_bank);
     }
 

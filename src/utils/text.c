@@ -61,10 +61,10 @@ uint8_t get_glyph_index(char character) {
         case '.':
             index = 42;
             break;
-        case '<':
+        case '(':
             index = 43;
             break;
-        case '>':
+        case ')':
             index = 44;
             break;
         case '+':
