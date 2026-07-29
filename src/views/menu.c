@@ -9,6 +9,9 @@
 #include <gb/metasprites.h>
 #include <stdint.h>
 
+uint8_t level_name_start;
+uint8_t level_name_end;
+
 void load_menu(void) {
     SPRITES_8x16;
 
@@ -64,6 +67,11 @@ void run_menu_loop(uint8_t *sprite_idx) {
 
             menu_end =
                 switch_selected_level(menu_start, menu_end, selected_level_idx);
+        }
+
+        if (pressed & J_START) {
+            slide_out_sprites(menu_end);
+            break;
         }
 
         prev_joy = joy;
@@ -146,14 +154,54 @@ uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
     for (uint8_t i = 0; i < level->difficulty; ++i)
         difficulty_text[i] = '*';
 
-    draw_sprite_text_8x8(map_text, 44, 80, TEXT_ANCHOR_LEFT, TEXT_ANCHOR_TOP, 0,
-                         &current_sprite);
-
+    level_name_start = current_sprite;
     draw_sprite_text_8x8(level->name, 92, 96, TEXT_ANCHOR_CENTER,
                          TEXT_ANCHOR_TOP, 1, &current_sprite);
+    level_name_end = current_sprite - 1;
+
+    draw_sprite_text_8x8(map_text, 44, 80, TEXT_ANCHOR_LEFT, TEXT_ANCHOR_TOP, 0,
+                         &current_sprite);
 
     draw_sprite_text_8x8(difficulty_text, 140, 112, TEXT_ANCHOR_RIGHT,
                          TEXT_ANCHOR_TOP, 0, &current_sprite);
 
     return current_sprite;
+}
+
+void slide_out_sprites(uint8_t menu_end) {
+    for (uint8_t sprite = 0; sprite < menu_end; ++sprite) {
+        if (sprite >= level_name_start && sprite <= level_name_end)
+            continue;
+
+        if (sprite < level_name_start) {
+            while (((shadow_OAM[sprite].y)) > 0) {
+                int8_t step = -6;
+                if (shadow_OAM[sprite].y + step < 0)
+                    step = -shadow_OAM[sprite].y;
+                scroll_sprite(sprite, 0, step);
+                vsync();
+            }
+        }
+
+        if (sprite > level_name_end) {
+            while (shadow_OAM[sprite].y != 96) {
+                int8_t step;
+
+                if (shadow_OAM[sprite].y < 96) {
+                    step = 4;
+                    if (shadow_OAM[sprite].y + step > 96)
+                        step = 96 - shadow_OAM[sprite].y;
+                } else {
+                    step = -4;
+                    if (shadow_OAM[sprite].y + step < 96)
+                        step = 96 - shadow_OAM[sprite].y;
+                }
+
+                scroll_sprite(sprite, 0, step);
+                vsync();
+            }
+
+            hide_sprites_range(sprite, sprite + 1);
+        }
+    }
 }

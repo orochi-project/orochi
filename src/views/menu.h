@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+extern uint8_t level_name_start;
+extern uint8_t level_name_end;
+
 /** Load and draw the menu background map. */
 void load_menu_background(void);
 
@@ -55,3 +58,5 @@ void run_menu_loop(uint8_t *sprite_idx);
  */
 uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
                               uint8_t level_id);
+
+void slide_out_sprites(uint8_t menu_end);
