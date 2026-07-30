@@ -1,3 +1,4 @@
+#include "views/loading.h"
 #include "views/menu.h"
 #include "constants/levels.h"
 #include "graphics/backgrounds/menu_background.h"
@@ -78,6 +79,8 @@ void run_menu_loop(uint8_t *sprite_idx) {
 
         vsync();
     }
+
+    show_loading_screen(sprite_idx);
 }
 
 void load_menu_background(void) {
