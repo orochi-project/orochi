@@ -47,16 +47,25 @@ void slide_down_logo(uint8_t distance_y, uint8_t speed,
 void run_menu_loop(uint8_t *sprite_idx);
 
 /**
- * Draws the current level onto the screen.
+ * Draw the current level onto the screen.
+ *
  * Removes old sprites and draws new ones in their positions.
  *
  * Returns the next free sprite index.
  *
- * @param sprite_start   Where to start drawing the sprite.
- * @param sprite_end     Where the sprite drawing ends.
- * @param level          The level to show.
+ * @param sprite_start  Where to start drawing the sprite.
+ * @param sprite_end    Where the sprite drawing ends.
+ * @param level         The level to show.
  */
 uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
                               uint8_t level_id);
 
-void slide_out_sprites(uint8_t menu_end);
+/**
+ * Animate the logo moving out when a level is selected by the player
+ *
+ * @param title_speed       The speed that the title moves out of the screen
+ * @param level_info_speed  The speed that the level information moves out of the screen
+ * @param menu_end          The sprite index of the tile after the last menu sprite.
+ */
+void slide_out_sprites(uint8_t title_speed, uint8_t level_info_speed,
+                       uint8_t menu_end);

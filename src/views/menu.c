@@ -70,7 +70,7 @@ void run_menu_loop(uint8_t *sprite_idx) {
         }
 
         if (pressed & J_START) {
-            slide_out_sprites(menu_end);
+            slide_out_sprites(6, 4, menu_end);
             break;
         }
 
@@ -168,40 +168,42 @@ uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
     return current_sprite;
 }
 
-void slide_out_sprites(uint8_t menu_end) {
-    for (uint8_t sprite = 0; sprite < menu_end; ++sprite) {
-        if (sprite >= level_name_start && sprite <= level_name_end)
-            continue;
+void slide_out_sprites(uint8_t title_speed, uint8_t level_info_speed,
+                       uint8_t menu_end) {
+    for (uint8_t sprite = 0; sprite < level_name_start;
+         ++sprite) { // animates the logo
+        // move the logo until it is out of the screen
+        while (((shadow_OAM[sprite].y)) > 0) {
+            int8_t step = -title_speed;
 
-        if (sprite < level_name_start) {
-            while (((shadow_OAM[sprite].y)) > 0) {
-                int8_t step = -6;
-                if (shadow_OAM[sprite].y + step < 0)
-                    step = -shadow_OAM[sprite].y;
-                scroll_sprite(sprite, 0, step);
-                vsync();
+            if (shadow_OAM[sprite].y + step < 0)
+                step = -shadow_OAM[sprite].y;
+
+            scroll_sprite(sprite, 0, step);
+            vsync();
+        }
+    }
+
+    for (uint8_t sprite = level_name_end + 1; sprite < menu_end; ++sprite) {
+        while (shadow_OAM[sprite].y !=
+               96) { // 96 is the y-position of the level name text
+            int8_t step;
+            // move the information into the level name, direction depending on
+            // whether the information is above or below the level name
+            if (shadow_OAM[sprite].y < 96) {
+                step = level_info_speed;
+                if (shadow_OAM[sprite].y + step > 96)
+                    step = 96 - shadow_OAM[sprite].y;
+            } else {
+                step = -level_info_speed;
+                if (shadow_OAM[sprite].y + step < 96)
+                    step = 96 - shadow_OAM[sprite].y;
             }
+
+            scroll_sprite(sprite, 0, step);
+            vsync();
         }
 
-        if (sprite > level_name_end) {
-            while (shadow_OAM[sprite].y != 96) {
-                int8_t step;
-
-                if (shadow_OAM[sprite].y < 96) {
-                    step = 4;
-                    if (shadow_OAM[sprite].y + step > 96)
-                        step = 96 - shadow_OAM[sprite].y;
-                } else {
-                    step = -4;
-                    if (shadow_OAM[sprite].y + step < 96)
-                        step = 96 - shadow_OAM[sprite].y;
-                }
-
-                scroll_sprite(sprite, 0, step);
-                vsync();
-            }
-
-            hide_sprites_range(sprite, sprite + 1);
-        }
+        hide_sprites_range(sprite, sprite + 1);
     }
 }
