@@ -46,8 +46,8 @@ GFX_GEN := $(addprefix $(BUILD)/generated/graphics/,$(PNG2ASSET_ASSETS))
 GFX_C_GEN := $(addsuffix .c,$(GFX_GEN))
 GFX_H_GEN := $(addsuffix .h,$(GFX_GEN))
 
-AUDIO_UGE := $(addprefix res/audio/,$(UGE2SOURCE_ASSETS))
-AUDIO_C_GEN := $(addprefix $(BUILD)/generated/audio/,$(UGE2SOURCE_ASSETS:%.uge=%.c))
+AUDIO_UGE := $(addprefix res/audio/,$(addsuffix .uge,$(UGE2SOURCE_ASSETS)))
+AUDIO_C_GEN := $(addprefix $(BUILD)/generated/audio/,$(addsuffix .c,$(UGE2SOURCE_ASSETS)))
 
 RES_C_DISK := $(shell find res -name '*.c' 2>/dev/null)
 RES_S := $(shell find res -name '*.s' 2>/dev/null)
@@ -87,11 +87,11 @@ $(BUILD)/generated/graphics/%.c $(BUILD)/generated/graphics/%.h &: $(BUILD)/gene
 
 # Export .uge files to .c dynamically
 $(BUILD)/generated/audio/%.c: res/audio/%.uge | $(BUILD)
-	$(if $(UGE2SOURCE_BANK/$*.uge),,$(error UGE2SOURCE_BANK/$*.uge is missing in uge2source.mk! Please enforce a bank assignment))
+	$(if $(UGE2SOURCE_BANK/$*),,$(error UGE2SOURCE_BANK/$* is missing in uge2source.mk! Please enforce a bank assignment))
 	@mkdir -p $(dir $@)
 	@echo '#include <gb/gb.h>' > $@
 	# @echo '#include <hUGEDriver.h>' >> $@
-	@echo '#pragma bank $(UGE2SOURCE_BANK/$*.uge)' >> $@
+	@echo '#pragma bank $(UGE2SOURCE_BANK/$*)' >> $@
 	# @echo '#pragma constseg _CODE_$(UGE2SOURCE_BANK/$*.uge)' >> $@
 	$(UGE2SOURCE) $< $(notdir $(basename $<)) $(BUILD)/generated/audio/tmp_song.c
 	@cat $(BUILD)/generated/audio/tmp_song.c >> $@
