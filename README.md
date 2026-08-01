@@ -2,6 +2,15 @@
 
 A rhythm game for the original Game Boy.
 
+## Acknowledgements
+
+All credits for the songs in this game belong to the following artists:
+
+1. [Komorebi](https://open.spotify.com/track/5IDaoVWnVNsXpiV9KOm9kI) by [Chasing Mirrors](https://open.spotify.com/artist/5rZuQbaBUI6qi8sB8tBcge)
+2. [Dream Flower](https://www.newgrounds.com/audio/listen/950723) by [KLYDIX](https://klydix.newgrounds.com)
+3. [Thirdboot](https://onlinesequencer.net/5544280) by [Syllue](https://onlinesequencer.net/members/76174)
+4. [Isolation](https://nighthawk22.com/music/isolation/isolation) by [NightHawk22](https://nighthawk22.com)
+
 ## Entering the Development Environment
 
 ### Native Linux with Nix Flake

@@ -5,8 +5,8 @@
 #include "hUGEDriver.h"
 #include "views/menu.h"
 
-extern const hUGESong_t freedom_dive;
-BANKREF_EXTERN(freedom_dive) // external ref to the bank with the track
+extern const hUGESong_t thirdboot;
+BANKREF_EXTERN(thirdboot) // external ref to the bank with the track
 
 /**
  * The currently selected audio bank.
@@ -58,13 +58,13 @@ void main(void) {
     add_VBL(play_sound_vbl);
 
     CRITICAL {
-        uint8_t song_bank = BANK(freedom_dive);
+        uint8_t song_bank = BANK(thirdboot);
         current_audio_bank = song_bank;
 
         uint8_t _previous_bank = _current_bank;
 
         SWITCH_ROM(song_bank);
-        hUGE_init(&freedom_dive);
+        hUGE_init(&thirdboot);
         SWITCH_ROM(_previous_bank);
     }
 

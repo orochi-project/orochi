@@ -10,8 +10,7 @@ const struct Level levels[LEVEL_COUNT] = {
         .difficulty = 2,
     },
     {
-        .name = "~@# (SBZ)", // 千本桜
+        .name = "Thirdboot",
         .difficulty = 3,
     },
-    {.name = "Isolation", .difficulty = 4},
-    {.name = "Freedom Dv", .difficulty = 5}};
+    {.name = "Isolation", .difficulty = 4}};

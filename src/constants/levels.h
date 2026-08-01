@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 /** The number of levels to be defined. */
-#define LEVEL_COUNT 5
+#define LEVEL_COUNT 4
 
 /** A structure representing a single level/map. */
 struct Level {

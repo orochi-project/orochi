@@ -1,9 +1,9 @@
-#include "views/loading.h"
 #include "views/menu.h"
 #include "constants/levels.h"
 #include "graphics/backgrounds/menu_background.h"
 #include "graphics/fonts/orochi_jp_16x16.h"
 #include "utils/text.h"
+#include "views/loading.h"
 
 #include <gb/gb.h>
 #include <gb/hardware.h>
@@ -153,7 +153,7 @@ uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
     char map_text[6] = "MAP _";
     map_text[4] = '1' + level_idx;
 
-    char difficulty_text[6] = "+++++";
+    char difficulty_text[6] = "++++";
     for (uint8_t i = 0; i < level->difficulty; ++i)
         difficulty_text[i] = '*';
 
