@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 /** The number of levels to be defined. */
-#define LEVEL_COUNT 4
+#define LEVEL_COUNT 5
 
 /** A structure representing a single level/map. */
 struct Level {
@@ -13,5 +13,4 @@ struct Level {
 };
 
 /** The list of levels in the game. */
-extern const struct Level
-    levels[LEVEL_COUNT];
+extern const struct Level levels[LEVEL_COUNT];
