@@ -8,9 +8,8 @@ PNG2ASSET_ASSETS := \
     fonts/orochi_jp_16x16 \
     fonts/yarara_font_8x8 \
     notes/hold_note \
-    notes/horizontal_tap_note \
+    notes/tap_note \
     notes/reverse_note \
-    notes/vertical_tap_note 
 
 # Per-asset png2asset flags, keyed by path relative to res/graphics/.
 # Add one line per .ase file that needs conversion.
@@ -21,7 +20,5 @@ PNG2ASSET_FLAGS/fillers/black_filler := -spr8x8 -sw 8 -sh 8
 PNG2ASSET_FLAGS/fonts/orochi_jp_16x16 := -spr8x16 -sw 16 -sh 16
 PNG2ASSET_FLAGS/fonts/yarara_font_8x8 := -spr8x8 -sw 8 -sh 8 -sprite_no_optimize
 PNG2ASSET_FLAGS/notes/hold_note := -spr16x16 -sw 16 -sh 16
-PNG2ASSET_FLAGS/notes/horizontal_tap_note := -spr16x16 -sw 16 -sh 16
+PNG2ASSET_FLAGS/notes/tap_note := -spr16x16 -sw 16 -sh 16
 PNG2ASSET_FLAGS/notes/reverse_note := -spr16x16 -sw 16 -sh 16
-PNG2ASSET_FLAGS/notes/vertical_tap_note := -spr16x16 -sw 16 -sh 16
-
