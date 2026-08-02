@@ -1,0 +1,4 @@
+midi2uge:
+  --chords --start-padding 8 --end-padding 8 --vol-3 3 --vol-4 0 --transpose -36
+
+ticks per row: 12
