@@ -147,7 +147,7 @@ uint8_t switch_selected_level(uint8_t sprite_start, uint8_t sprite_end,
 
     uint8_t current_sprite = sprite_start;
 
-    const struct Level *level = &levels[level_idx];
+    const Level *level = &levels[level_idx];
 
     // for now we assume there are no more than 9 total levels
     char map_text[6] = "MAP _";
