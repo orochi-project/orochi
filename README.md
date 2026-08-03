@@ -2,7 +2,7 @@
 
 # Orochi
 
-A rhythm game for the original Game Boy.
+A Cytus-inspired rhythm game for the Game Boy Color.
 
 ## Acknowledgements
 
