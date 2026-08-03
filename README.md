@@ -1,3 +1,5 @@
+<img align="left" src="docs/media/logo.png" alt="Logo" width="64" />
+
 # Orochi
 
 A rhythm game for the original Game Boy.
