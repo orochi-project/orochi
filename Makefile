@@ -30,6 +30,8 @@ LCCFLAGS += -Wm-yt0x19
 # for our purposes.)
 LCCFLAGS += -Wm-yo8
 
+LCCFLAGS += -autobank
+
 # Include directories/paths
 INCLUDES := -Isrc -Ires -I$(BUILD)/generated -I$(HUGEDRIVER)/include
 
