@@ -19,11 +19,13 @@
         src = ./.;
 
         nativeBuildInputs = [
-          gbdk
+          crosszgb
         ];
 
         buildPhase = ''
-          export GBDK_HOME=${gbdk}
+          export GBDK_HOME=${crosszgb}/gbdk
+          export ZGB_PATH=${crosszgb}/ZGB/common
+          export HUGEDRIVER=${hugedriver}
           export PATH=$GBDK_HOME/bin:$PATH
           make
         '';
@@ -34,13 +36,13 @@
         '';
       };
 
-      gbdk = pkgs.stdenv.mkDerivation {
-        pname = "gbdk";
-        version = "4.5.0";
+      crosszgb = pkgs.stdenv.mkDerivation {
+        pname = "crosszgb";
+        version = "26.1";
 
         src = pkgs.fetchzip {
-          url = "https://github.com/gbdk-2020/gbdk-2020/releases/download/4.5.0/gbdk-linux64.tar.gz";
-          hash = "sha256-SeLoKHRAAq+3xVog8kBV9hj2wrQ24JvOQml3A8p1Yyg=";
+          url = "https://github.com/gbdk-2020/CrossZGB/releases/download/v2026.1/ZGB-Linux-x64.tar.gz";
+          hash = "sha256-nzGzVmdGZRemenHoPLDr+4Dp2RgfY6BK3csmJpCOL6o=";
         };
 
         nativeBuildInputs = with pkgs; [
@@ -57,8 +59,8 @@
           mkdir -p $out
           cp -r . $out
 
-          wrapProgram $out/bin/lcc \
-            --set GBDKDIR "$out/"
+          wrapProgram $out/gbdk/bin/lcc \
+            --set GBDKDIR "$out/gbdk/"
         '';
       };
 
@@ -170,7 +172,7 @@
         intercept:
           mode: preload
         compilers:
-          - path: ${gbdk}/bin/sdcc
+          - path: ${crosszgb}/gbdk/bin/sdcc
             as: gcc
       '';
 
@@ -180,7 +182,7 @@
     in {
       packages = {
         default = orochi;
-        gbdk = gbdk;
+        crosszgb = crosszgb;
         hugetracker = hugetracker;
         hugedriver = hugedriver;
       };
@@ -194,7 +196,7 @@
 
       devShells.default = pkgs.mkShell {
         packages = [
-          gbdk
+          crosszgb
           hugetracker
           hugedriver
           makeWithBear
@@ -206,8 +208,10 @@
         ];
 
         shellHook = ''
-          export GBDK_HOME=${gbdk}
+          export GBDK_HOME=${crosszgb}/gbdk
+          export ZGB_PATH=${crosszgb}/ZGB/common
           export HUGEDRIVER=${hugedriver}
+          export PATH=$GBDK_HOME/bin:$PATH
           ln -sf ${bearConfig} bear.yml
         '';
       };

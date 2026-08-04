@@ -3,13 +3,12 @@
 .direnv/
 
 # Built files
+bin/
+obj/
 build/
-result
+result/
 
 # Single-user tooling configurations
 bear.yml
 compile_commands.json
 compile_commands.tmp
-
-# Single-user scripts
-scripts/.wslmake.sh
