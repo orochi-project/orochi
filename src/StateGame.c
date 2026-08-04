@@ -4,11 +4,11 @@
 #include "SpriteManager.h"
 #include "ZGBMain.h"
 
-IMPORT_MAP(map);
+IMPORT_MAP(menu_map);
 
 void START(void) {
     scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
-    InitScroll(BANK(map), &map, 0, 0);
+    InitScroll(BANK(menu_map), &menu_map, 0, 0);
 }
 
 void UPDATE(void) {}
