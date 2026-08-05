@@ -15,6 +15,7 @@ typedef struct {
                            ///< typewriter instance.
     uint8_t palette_idx;   ///< The palette index to display the text with.
     uint8_t character_idx; ///< The current character index.
+    uint16_t font_offset;  ///< The font offset.
     bool active;
 } Typewriter;
 
@@ -50,6 +51,7 @@ int8_t DrawText(const unsigned char *text, uint8_t tile_x, uint8_t tile_y,
         typewriters[typewriter_idx].palette_idx = palette_idx;
         typewriters[typewriter_idx].character_idx = 0;
         typewriters[typewriter_idx].active = true;
+        typewriters[typewriter_idx].font_offset = font_offset;
     } else {
         PRINT(tile_x, tile_y, text);
 #ifdef CGB
@@ -66,7 +68,7 @@ void UpdateTypewriter(void) {
          ++typewriter_slot) {
         Typewriter *typewriter = &typewriters[typewriter_slot];
         if (!typewriter->active ||
-            typewriter->character_idx >= typewriter->length) // inactive or done
+            typewriter->character_idx >= typewriter->length)
             continue;
 
         ++typewriter->timer;
@@ -77,15 +79,20 @@ void UpdateTypewriter(void) {
 
         unsigned char buffer[2] = {typewriter->text[typewriter->character_idx],
                                    '\0'};
+
+        uint16_t saved_font_offset = font_offset;
+        font_offset = typewriter->font_offset; // switch font
+
         PRINT(typewriter->tile_x + typewriter->character_idx,
               typewriter->tile_y, buffer);
+
+        font_offset = saved_font_offset; // restore
 
 #ifdef CGB
         set_bkg_attribute_xy(typewriter->tile_x + typewriter->character_idx,
                              typewriter->tile_y,
                              typewriter->palette_idx & 0x07);
 #endif
-
         ++typewriter->character_idx;
     }
 }
