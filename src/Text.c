@@ -34,7 +34,7 @@ int8_t DrawText(const unsigned char *text, uint8_t tile_x, uint8_t tile_y,
     if (typewriter_idx >= MAX_TYPEWRITERS) // no free slot
         return -1;
 
-    uint8_t text_length = strlen(text);
+    uint8_t text_length = strlen((const char *)text);
 
     if (text_anchor == TEXT_ANCHOR_CENTER)
         tile_x -= text_length / 2;
