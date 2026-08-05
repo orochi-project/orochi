@@ -1,7 +1,7 @@
 #include "Banks/SetAutoBank.h"
-#include "Levels.h"
+#include "Maps.h"
 
-const Level maps[MAP_COUNT] = {{
+const Map maps[MAP_COUNT] = {{
                                    .name = "Komorebi",
                                    .difficulty = 1,
                                },
