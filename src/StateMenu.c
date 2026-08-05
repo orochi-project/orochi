@@ -4,29 +4,60 @@
 // #include "SpriteManager.h"
 #include "Text.h"
 #include "ZGBMain.h"
+#include "gb/gb.h"
+#include <stdint.h>
 
 IMPORT_MAP(menu_map);
+
 IMPORT_TILES(japanese_glyphs);
 IMPORT_TILES(yarara_font);
+IMPORT_TILES(map_selector_tiles);
+
+/** The number of map selector rows to display. */
+#define MAP_SELECTOR_ROW_COUNT 11
 
 /** Represents the possible logo states. */
-typedef enum { LOGO_KANJI, LOGO_ROMAJI } LogoState;
+typedef enum {
+    MENU_LOGO_KANJI,
+    MENU_LOGO_ROMAJI,
+    MENU_OVERLAY_LEVEL_SELECTOR
+} MenuCheckpoint;
 
-/** The current logo state. */
-static LogoState logo_state;
+/** The current menu state. */
+static MenuCheckpoint menu_checkpoint;
 /** The upper kanji typewriter index. */
 static int8_t kanji_upper_typewriter_idx;
 /** The lower kanji typewriter index. */
 static int8_t kanji_lower_typewriter_idx;
+/** The romaji typewriter index. */
+static int8_t romaji_typewriter_idx;
 
-void DrawKanji(void);
-void DrawRomaji(void);
+/** The map selector row tiles as font characters. */
+const unsigned char *map_selector_rows[MAP_SELECTOR_ROW_COUNT] = {
+    "AEEEEEEEEEEEEC", "GIIIIIIIIIIIIH", "GIIIIIIIIIIIIH", "GIIIIIIIIIIIIH",
+    "JJJJJJJJJJJJJJ", "JJJJJJJJJJJJJJ", "JJJJJJJJJJJJJJ", "GKLMNIIIISTUVH",
+    "GOPQRIIIIWXYZH", "GII01234567IIH", "BFFFFFFFFFFFFD",
+};
+
+/** Draw the logo kanji text. */
+void DrawLogoKanji(void);
+
+/** Draw the logo romaji text. */
+void DrawLogoRomaji(void);
+
+/**
+ * Draw the map selector overlay.
+ *
+ * @param tile_x    The starting x-tile to draw the overlay.
+ * @param tile_y    The starting y-tile to draw the overlay.
+ */
+void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
 
 void START(void) {
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_map), &menu_map, 0, 0);
 
-    DrawKanji();
+    DrawLogoKanji();
 }
 
 void UPDATE(void) {
@@ -34,28 +65,46 @@ void UPDATE(void) {
 
     // kanji done
     // now draw romaji
-    if (logo_state == LOGO_KANJI &&
+    if (menu_checkpoint == MENU_LOGO_KANJI &&
         TypewriterIsDone(kanji_upper_typewriter_idx) &&
         TypewriterIsDone(kanji_lower_typewriter_idx)) {
-        DrawRomaji();
+        DrawLogoRomaji();
     }
+
+    if (menu_checkpoint == MENU_LOGO_ROMAJI &&
+        TypewriterIsDone(romaji_typewriter_idx))
+        DrawOverlayMapSelector(3, 5);
 }
 
-void DrawKanji(void) {
+void DrawLogoKanji(void) {
     INIT_FONT(japanese_glyphs, PRINT_BKG);
 
     kanji_upper_typewriter_idx =
-        DrawText("ABEF", 4, 1, TEXT_ANCHOR_LEFT, 10, 2); // upper half of 大蛇
+        DrawText("ABEF", 4, 1, TEXT_ANCHOR_LEFT, 10,
+                 TEXT_PRIMARY_PALETTE_IDX); // upper half of 大蛇
     kanji_lower_typewriter_idx =
-        DrawText("CDGH", 4, 2, TEXT_ANCHOR_LEFT, 10, 2); // lower half of 大蛇
+        DrawText("CDGH", 4, 2, TEXT_ANCHOR_LEFT, 10,
+                 TEXT_PRIMARY_PALETTE_IDX); // lower half of 大蛇
 
-    logo_state = LOGO_KANJI;
+    menu_checkpoint = MENU_LOGO_KANJI;
 }
 
-void DrawRomaji(void) {
+void DrawLogoRomaji(void) {
     INIT_FONT(yarara_font, PRINT_BKG);
 
-    DrawText("OROCHI!", 9, 2, TEXT_ANCHOR_LEFT, 10, 2);
+    romaji_typewriter_idx = DrawText("OROCHI!", 9, 2, TEXT_ANCHOR_LEFT, 10,
+                                     TEXT_PRIMARY_PALETTE_IDX);
 
-    logo_state = LOGO_ROMAJI;
+    menu_checkpoint = MENU_LOGO_ROMAJI;
+}
+
+void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
+    INIT_FONT(map_selector_tiles, PRINT_BKG);
+
+    for (uint8_t row = 0; row < MAP_SELECTOR_ROW_COUNT; ++row) {
+        PRINT(tile_x, tile_y, map_selector_rows[row]);
+        ++tile_y;
+    }
+
+    menu_checkpoint = MENU_OVERLAY_LEVEL_SELECTOR;
 }
