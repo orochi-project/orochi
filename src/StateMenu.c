@@ -1,6 +1,7 @@
 #include "Banks/SetAutoBank.h"
 #include "Keys.h"
 #include "Maps.h"
+#include "Palette.h"
 #include "Print.h"
 #include "Scroll.h"
 #include "Text.h"
@@ -9,20 +10,20 @@
 #include <stdint.h>
 #include <string.h>
 
-IMPORT_MAP(menu_map);
+IMPORT_MAP(menu_background);
+IMPORT_MAP(menu_map_selector);
 
 IMPORT_TILES(japanese_glyphs);
 IMPORT_TILES(yarara_font_primary);
 IMPORT_TILES(yarara_font_secondary);
-IMPORT_TILES(map_selector_tiles);
+
+extern const palette_color_t menu_map_selector_palettes[4];
 
 /** The starting x-position to place the map selector. */
 #define MAP_SELECTOR_TILE_X 3
 /** The starting y-position to place the map selector. */
 #define MAP_SELECTOR_TILE_Y 5
-/** The number of map selector rows to display. */
-#define MAP_SELECTOR_ROW_COUNT 11
-/** The palette index that points to the map selector tile colors. */
+/** The palette index that points to the map selector overlay colors. */
 #define MAP_SELECTOR_PALETTE_IDX 3
 
 /** Represents the possible logo states. */
@@ -38,7 +39,6 @@ typedef struct {
     int8_t japanese_glyphs_font_offset;
     int8_t yarara_font_primary_font_offset;
     int8_t yarara_font_secondary_font_offset;
-    int8_t map_selector_tiles_font_offset;
 } FontOffset;
 
 /** The saved menu font offsets. */
@@ -63,14 +63,6 @@ static int8_t map_difficulty_typewriter_idx = -1;
 /** The typewriter index for the map name text. */
 static int8_t map_name_typewriter_idx = -1;
 
-/** The map selector row tiles as font characters. */
-const char *map_selector_rows[MAP_SELECTOR_ROW_COUNT] = {
-    "AEEEEEEEEEEEEC", "GIIIIIIIIIIIIH", "GIIIIIIIIIIIIH", "GIIIIIIIIIIIIH",
-    "JJJJJJJJJJJJJJ", "JJJJJJJJJJJJJJ", "JJJJJJJJJJJJJJ", "GKLMNIIIISTUVH",
-    "GOPQRIIIIWXYZH", "GII01234567IIH", "BFFFFFFFFFFFFD",
-}; // yes, this is rendered as a font because I couldn't figure out how to
-   // insert an image onto an existing background. sorry!
-
 /** Draw the logo kanji text. */
 void DrawLogoKanji(void);
 
@@ -88,7 +80,7 @@ void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
 
 void START(void) {
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
-    InitScroll(BANK(menu_map), &menu_map, 0, 0);
+    InitScroll(BANK(menu_background), &menu_background, 0, 0);
 
     INIT_FONT(japanese_glyphs, PRINT_BKG);
     font_offsets.japanese_glyphs_font_offset = font_offset;
@@ -98,9 +90,6 @@ void START(void) {
 
     INIT_FONT(yarara_font_secondary, PRINT_BKG);
     font_offsets.yarara_font_secondary_font_offset = font_offset;
-
-    INIT_FONT(map_selector_tiles, PRINT_BKG);
-    font_offsets.map_selector_tiles_font_offset = font_offset;
 
     DrawLogoKanji();
 }
@@ -177,11 +166,33 @@ void DrawLogoRomaji(void) {
 void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
     wait_vbl_done();
 
-    font_offset = font_offsets.map_selector_tiles_font_offset;
+    // set palette for level selector manually
+    SetPalette(BG_PALETTE, MAP_SELECTOR_PALETTE_IDX, 1,
+               menu_map_selector_palettes, BANK(menu_map_selector));
 
-    for (uint8_t row = 0; row < MAP_SELECTOR_ROW_COUNT; ++row)
-        DrawText((const unsigned char *)map_selector_rows[row], tile_x,
-                 tile_y++, TEXT_ANCHOR_LEFT, 0, MAP_SELECTOR_PALETTE_IDX);
+    // load the tile graphics
+    // LoadMap() basically does this, but we need to do this manually to be able
+    // to patch the attributes and thus set the palette correctly
+    uint16_t map_offset =
+        ScrollSetTiles(last_tile_loaded, menu_map_selector.tiles_bank,
+                       menu_map_selector.tiles);
+
+    // patch each tile's attribute byte to point at our slot instead of 0,
+    // since the exported asset hardcodes palette index 0 for whatever reason
+    const unsigned char *data = menu_map_selector.data;
+    const unsigned char *attributes = menu_map_selector.attributes;
+
+    for (uint8_t y = 0; y < menu_map_selector.height; ++y)
+        for (uint8_t x = 0; x < menu_map_selector.width; ++x) {
+            uint8_t patched_attributes =
+                (*attributes & ~0x07) | MAP_SELECTOR_PALETTE_IDX;
+
+            UpdateMapTile(TARGET_BKG, tile_x + x, tile_y + y, map_offset, *data,
+                          &patched_attributes);
+
+            ++data;
+            ++attributes;
+        }
 
     menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
 }
