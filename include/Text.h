@@ -19,12 +19,12 @@ typedef enum {
 } TextAnchor;
 
 /**
- * Draw text with the Yarara Font as background tiles.
+ * Draw text as background tiles.
  *
  * @param text              The string of text to draw onto the background
  * layer.
- * @param x_position        The x-position of the text.
- * @param y_position        The y-position of the text.
+ * @param tile_x            The x-position of the text.
+ * @param tile_y            The y-position of the text.
  * @param text_anchor       Whether to anchor the text on the left, center, or
  * right.
  * @param typewriter_delay  The typewriter effect delay between characters (0 to
@@ -43,7 +43,7 @@ void UpdateTypewriter(void);
 /**
  * Whether or not the typewriter effect is complete.
  *
- * @param   The typewriter index to check.
+ * @param typewriter_idx    The typewriter index to check.
  *
  * @return  Whether or not the typewriter is done.
  */
@@ -52,6 +52,6 @@ bool TypewriterIsDone(uint8_t typewriter_idx);
 /**
  * Reset the typewriter state.
  *
- * @param   The typewriter index to reset.
+ * @param typewriter_idx    The typewriter index to reset.
  */
 void ResetTypewriter(uint8_t typewriter_idx);
