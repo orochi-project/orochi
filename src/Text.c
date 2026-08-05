@@ -94,6 +94,9 @@ void UpdateTypewriter(void) {
                              typewriter->palette_idx & 0x07);
 #endif
         ++typewriter->character_idx;
+
+        if (typewriter->character_idx >= typewriter->length)
+            typewriter->active = false;
     }
 }
 
