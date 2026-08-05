@@ -1,5 +1,4 @@
 #include "Text.h"
-#include "Banks/SetAutoBank.h"
 #include "Print.h"
 #include <gbdk/platform.h>
 #include <string.h>
