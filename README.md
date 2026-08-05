@@ -1,5 +1,9 @@
 <img align="left" src="docs/media/logo.png" alt="Logo" width="64" />
 
+> [!NOTE]
+> This project is currently being rewritten using [CrossZGB](https://github.com/gbdk-2020/CrossZGB) due to some random (and probably extremely obscure) issues we've encountered upon along the way.
+> The result after the rewrite should be much cleaner.
+
 # Orochi
 
 A Cytus-inspired rhythm game for the Game Boy Color.
