@@ -171,6 +171,9 @@ void DrawLogoRomaji(void) {
 void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
     wait_vbl_done();
 
+    uint8_t _saved_bank = CURRENT_BANK;
+    SWITCH_ROM(BANK(menu_map_selector));
+
     // set palette for level selector manually
     SetPalette(BG_PALETTE, MAP_SELECTOR_PALETTE_IDX, 1,
                menu_map_selector_palettes, BANK(menu_map_selector));
@@ -198,6 +201,8 @@ void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
             ++data;
             ++attributes;
         }
+
+    SWITCH_ROM(_saved_bank);
 
     menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
 }
