@@ -1,2 +1,7 @@
+.PHONY: all clean run
+
 all clean:
-	make -C src $(MAKECMDGOALS)
+	$(MAKE) -C src $@
+
+run:
+	$(MAKE) -C src run EXT=gbc

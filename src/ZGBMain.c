@@ -1,17 +1,18 @@
 #include "ZGBMain.h"
 #include "Math.h"
+#include <stdint.h>
 
-UINT8 next_state = StateGame;
+uint8_t next_state = StateMenu;
 
-UINT8 GetTileReplacement(UINT8 *tile_ptr, UINT8 *tile) {
-    if (current_state == StateGame) {
-        if (U_LESS_THAN(255 - (UINT16)*tile_ptr, N_SPRITE_TYPES)) {
+uint8_t GetTileReplacement(uint8_t *tile_ptr, uint8_t *tile) {
+    if (current_state == StateMenu) {
+        if (U_LESS_THAN(255 - (uint16_t)*tile_ptr, N_SPRITE_TYPES)) {
             *tile = 0;
-            return 255 - (UINT16)*tile_ptr;
+            return 255 - (uint16_t)*tile_ptr;
         }
 
         *tile = *tile_ptr;
     }
 
-    return 255u;
+    return 255;
 }

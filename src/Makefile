@@ -1,4 +1,5 @@
 PROJECT_NAME = OROCHI
+EMULATOR = gearboy
 
 # Set platforms to build here, space-separated. (These are in the separate Makefile.targets.)
 # They can also be built/cleaned individually: "make gg" and "make gg-clean"

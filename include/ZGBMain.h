@@ -1,7 +1,7 @@
 #pragma once
 
 #define STATES                                                                 \
-    _STATE(StateGame)                                                          \
+    _STATE(StateMenu)                                                          \
     STATE_DEF_END
 
 #define SPRITES                                                                \

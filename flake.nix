@@ -205,6 +205,7 @@
           pkgs.bear
           pkgs.gearboy
           pkgs.libresprite
+          (pkgs.python3.withPackages (ps: [ps.pillow]))
         ];
 
         shellHook = ''
@@ -213,6 +214,44 @@
           export HUGEDRIVER=${hugedriver}
           export PATH=$GBDK_HOME/bin:$PATH
           ln -sf ${bearConfig} bear.yml
+
+          fix-compdb() {
+            python3 -c "
+              import json, re
+              with open('compile_commands.json') as f:
+                  db = json.load(f)
+
+              sdcc_only = [
+                  '-msm83', '-msm83:gb', '--no-std-crt0', '--fsigned-char',
+                  '--use-stdout', '--no-optsdcc-in-asm', '--std-sdcc99',
+                  '--codeseg', '--constseg', '--peep-file', '--opt-code-speed',
+                  '--model-small', '--no-xinit-opt', '--all-callee-saves',
+                  '--stack-auto', '--int-long-reent', '--float-reent',
+                  '--out-fmt-ihx', '--debug', '-Wl', '-Wa', '-Wa-pogN'
+              ]
+
+              for entry in db:
+                  args = entry.get('arguments', [])
+                  new_args = []
+                  skip_next = False
+                  for i, arg in enumerate(args):
+                      if skip_next:
+                          skip_next = False
+                          continue
+                      if arg in sdcc_only:
+                          continue
+                      if arg == '--max-allocs-per-node':
+                          skip_next = True  # skip the '50000' that follows
+                          continue
+                      if arg == '--max-allocs-per-node 50000':
+                          continue
+                      new_args.append(arg)
+                  entry['arguments'] = new_args
+
+              with open('compile_commands.json', 'w') as f:
+                  json.dump(db, f, indent=2)
+            "
+          }
         '';
       };
     });

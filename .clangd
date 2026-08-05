@@ -1,11 +1,30 @@
 CompileFlags:
   Add:
-    - -fsigned-char
-    - -ffreestanding
+    - -include
   Remove:
     - -msm83
     - --no-std-crt0
-    - --fsigned-char
     - --use-stdout
     - --no-optsdcc-in-asm
     - -Wa-pogN
+    - --std-sdcc99
+    - --codeseg
+    - --constseg
+    - --peep-file
+    - --opt-code-speed
+    - --model-small
+    - --no-xinit-opt
+    - --all-callee-saves
+    - --stack-auto
+    - --int-long-reent
+    - --float-reent
+    - --out-fmt-ihx
+    - --debug
+    - -Wl
+    - -Wa
+
+Diagnostics:
+  Suppress:
+    - pointer-to-int-cast
+    - void-pointer-to-int-cast
+    - int-conversion
