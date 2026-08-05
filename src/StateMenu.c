@@ -10,7 +10,8 @@
 IMPORT_MAP(menu_map);
 
 IMPORT_TILES(japanese_glyphs);
-IMPORT_TILES(yarara_font);
+IMPORT_TILES(yarara_font_primary);
+IMPORT_TILES(yarara_font_secondary);
 IMPORT_TILES(map_selector_tiles);
 
 /** The number of map selector rows to display. */
@@ -20,7 +21,8 @@ IMPORT_TILES(map_selector_tiles);
 typedef enum {
     MENU_LOGO_KANJI,
     MENU_LOGO_ROMAJI,
-    MENU_OVERLAY_LEVEL_SELECTOR
+    MENU_OVERLAY_LEVEL_SELECTOR,
+    MENU_MAP_LABELS,
 } MenuCheckpoint;
 
 /** The current menu state. */
@@ -45,6 +47,7 @@ void DrawLogoKanji(void);
 /** Draw the logo romaji text. */
 void DrawLogoRomaji(void);
 
+void DrawMapLabels(void);
 /**
  * Draw the map selector overlay.
  *
@@ -74,6 +77,10 @@ void UPDATE(void) {
     if (menu_checkpoint == MENU_LOGO_ROMAJI &&
         TypewriterIsDone(romaji_typewriter_idx))
         DrawOverlayMapSelector(3, 5);
+
+    if (menu_checkpoint == MENU_OVERLAY_LEVEL_SELECTOR) {
+        DrawMapLabels();
+    }
 }
 
 void DrawLogoKanji(void) {
@@ -90,7 +97,7 @@ void DrawLogoKanji(void) {
 }
 
 void DrawLogoRomaji(void) {
-    INIT_FONT(yarara_font, PRINT_BKG);
+    INIT_FONT(yarara_font_primary, PRINT_BKG);
 
     romaji_typewriter_idx = DrawText("OROCHI!", 9, 2, TEXT_ANCHOR_LEFT, 10,
                                      TEXT_PRIMARY_PALETTE_IDX);
@@ -107,4 +114,18 @@ void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
     }
 
     menu_checkpoint = MENU_OVERLAY_LEVEL_SELECTOR;
+}
+
+void DrawMapLabels(void) {
+    INIT_FONT(yarara_font_primary, PRINT_BKG);
+
+    DrawText("Map 1", 4, 7, TEXT_ANCHOR_LEFT, 3, TEXT_PRIMARY_PALETTE_IDX);
+    DrawText("?:::", 16, 7, TEXT_ANCHOR_RIGHT, 3, TEXT_PRIMARY_PALETTE_IDX);
+
+    INIT_FONT(yarara_font_secondary, PRINT_BKG);
+
+    DrawText("Isolation", 4, 10, TEXT_ANCHOR_LEFT, 3,
+             TEXT_SECONDARY_PALETTE_IDX);
+
+    menu_checkpoint = MENU_MAP_LABELS;
 }

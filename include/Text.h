@@ -6,10 +6,10 @@
 /** The sprite index that points to the primary text color. */
 #define TEXT_PRIMARY_PALETTE_IDX 1
 /** The sprite index that points to the secondary text color. */
-#define TEXT_SECONDARY_PALETTE_IDX 2
+#define TEXT_SECONDARY_PALETTE_IDX 3
 
 /** The maximum number of concurrent typewriters allowed. */
-#define MAX_TYPEWRITERS 4
+#define MAX_TYPEWRITERS 8
 
 /** The text anchor placement on the x-axis (left, center, or right). */
 typedef enum {
