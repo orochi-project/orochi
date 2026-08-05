@@ -1,6 +1,7 @@
 #include "Banks/SetAutoBank.h"
 #include "Keys.h"
 #include "Maps.h"
+#include "Music.h"
 #include "Palette.h"
 #include "Print.h"
 #include "Scroll.h"
@@ -16,6 +17,8 @@ IMPORT_MAP(menu_map_selector);
 IMPORT_TILES(japanese_glyphs);
 IMPORT_TILES(yarara_font_primary);
 IMPORT_TILES(yarara_font_secondary);
+
+DECLARE_MUSIC(isolation);
 
 extern const palette_color_t menu_map_selector_palettes[4];
 
@@ -81,6 +84,8 @@ void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
 void START(void) {
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
+
+    PlayMusic(isolation, LOOP);
 
     INIT_FONT(japanese_glyphs, PRINT_BKG);
     font_offsets.japanese_glyphs_font_offset = font_offset;
