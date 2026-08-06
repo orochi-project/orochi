@@ -137,7 +137,8 @@ void UPDATE(void) {
                 selected_map_idx = MAP_COUNT - 1;
 
             DrawMapLabels();
-        }
+        } else if (KEY_TICKED(J_START))
+            SetState(StateGame);
     }
 }
 
