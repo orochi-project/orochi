@@ -1,4 +1,0 @@
-midi2uge:
-  --start-padding -16 --end-padding 16 --vol-4 0
-
-ticks per row: 9

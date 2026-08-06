@@ -19,11 +19,13 @@
         src = ./.;
 
         nativeBuildInputs = [
-          gbdk
+          crosszgb
         ];
 
         buildPhase = ''
-          export GBDK_HOME=${gbdk}
+          export GBDK_HOME=${crosszgb}/gbdk
+          export ZGB_PATH=${crosszgb}/ZGB/common
+          export HUGEDRIVER=${hugedriver}
           export PATH=$GBDK_HOME/bin:$PATH
           make
         '';
@@ -34,13 +36,13 @@
         '';
       };
 
-      gbdk = pkgs.stdenv.mkDerivation {
-        pname = "gbdk";
-        version = "4.5.0";
+      crosszgb = pkgs.stdenv.mkDerivation {
+        pname = "crosszgb";
+        version = "26.1";
 
         src = pkgs.fetchzip {
-          url = "https://github.com/gbdk-2020/gbdk-2020/releases/download/4.5.0/gbdk-linux64.tar.gz";
-          hash = "sha256-SeLoKHRAAq+3xVog8kBV9hj2wrQ24JvOQml3A8p1Yyg=";
+          url = "https://github.com/gbdk-2020/CrossZGB/releases/download/v2026.1/ZGB-Linux-x64.tar.gz";
+          hash = "sha256-nzGzVmdGZRemenHoPLDr+4Dp2RgfY6BK3csmJpCOL6o=";
         };
 
         nativeBuildInputs = with pkgs; [
@@ -57,8 +59,8 @@
           mkdir -p $out
           cp -r . $out
 
-          wrapProgram $out/bin/lcc \
-            --set GBDKDIR "$out/"
+          wrapProgram $out/gbdk/bin/lcc \
+            --set GBDKDIR "$out/gbdk/"
         '';
       };
 
@@ -170,7 +172,7 @@
         intercept:
           mode: preload
         compilers:
-          - path: ${gbdk}/bin/sdcc
+          - path: ${crosszgb}/gbdk/bin/sdcc
             as: gcc
       '';
 
@@ -180,7 +182,7 @@
     in {
       packages = {
         default = orochi;
-        gbdk = gbdk;
+        crosszgb = crosszgb;
         hugetracker = hugetracker;
         hugedriver = hugedriver;
       };
@@ -194,7 +196,7 @@
 
       devShells.default = pkgs.mkShell {
         packages = [
-          gbdk
+          crosszgb
           hugetracker
           hugedriver
           makeWithBear
@@ -203,12 +205,53 @@
           pkgs.bear
           pkgs.gearboy
           pkgs.libresprite
+          (pkgs.python3.withPackages (ps: [ps.pillow]))
         ];
 
         shellHook = ''
-          export GBDK_HOME=${gbdk}
+          export GBDK_HOME=${crosszgb}/gbdk
+          export ZGB_PATH=${crosszgb}/ZGB/common
           export HUGEDRIVER=${hugedriver}
+          export PATH=$GBDK_HOME/bin:$PATH
           ln -sf ${bearConfig} bear.yml
+
+          fix-compdb() {
+            python3 -c "
+              import json, re
+              with open('compile_commands.json') as f:
+                  db = json.load(f)
+
+              sdcc_only = [
+                  '-msm83', '-msm83:gb', '--no-std-crt0', '--fsigned-char',
+                  '--use-stdout', '--no-optsdcc-in-asm', '--std-sdcc99',
+                  '--codeseg', '--constseg', '--peep-file', '--opt-code-speed',
+                  '--model-small', '--no-xinit-opt', '--all-callee-saves',
+                  '--stack-auto', '--int-long-reent', '--float-reent',
+                  '--out-fmt-ihx', '--debug', '-Wl', '-Wa', '-Wa-pogN'
+              ]
+
+              for entry in db:
+                  args = entry.get('arguments', [])
+                  new_args = []
+                  skip_next = False
+                  for i, arg in enumerate(args):
+                      if skip_next:
+                          skip_next = False
+                          continue
+                      if arg in sdcc_only:
+                          continue
+                      if arg == '--max-allocs-per-node':
+                          skip_next = True  # skip the '50000' that follows
+                          continue
+                      if arg == '--max-allocs-per-node 50000':
+                          continue
+                      new_args.append(arg)
+                  entry['arguments'] = new_args
+
+              with open('compile_commands.json', 'w') as f:
+                  json.dump(db, f, indent=2)
+            "
+          }
         '';
       };
     });
