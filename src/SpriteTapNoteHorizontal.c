@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+#include "Keys.h"
 #include "Maps.h"
 #include "Scroll.h"
 #include "ZGBMain.h"
@@ -21,6 +22,7 @@ void UPDATE(void) {
 
     --data->timer;
 
+    // wait TIMER_INTERVAL until running the next frame animation
     if (data->timer == 0) {
         if (data->current_frame < 4)
             ++data->current_frame;
@@ -29,6 +31,16 @@ void UPDATE(void) {
 
         data->timer = TIMER_INTERVAL;
         SetFrame(THIS, data->current_frame);
+    }
+
+    // If the note collides with the scanline and the correct direction is
+    // pressed, delete the note
+    if (CheckCollision(THIS, scanline_sprite)) {
+        if ((THIS->mirror && KEY_TICKED(J_LEFT)) ||
+            (!THIS->mirror && KEY_TICKED(J_RIGHT))) {
+            SpriteManagerRemoveSprite(THIS);
+            return;
+        }
     }
 }
 

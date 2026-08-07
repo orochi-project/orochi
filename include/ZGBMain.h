@@ -13,3 +13,5 @@
     SPRITE_DEF_END
 
 #include "ZGBMain_Init.h"
+
+extern Sprite *scanline_sprite;
