@@ -82,7 +82,6 @@ void DrawMapLabels(void);
 void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
 
 void START(void) {
-    // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
 
     PlayMusic(isolation, LOOP);

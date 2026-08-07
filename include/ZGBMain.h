@@ -6,7 +6,6 @@
     STATE_DEF_END
 
 #define SPRITES                                                                \
-    _SPRITE(SpritePlayer, player, FLIP_NONE)                                   \
     _SPRITE(SpriteScanline, scanline, FLIP_NONE)                               \
     _SPRITE(SpriteTapNoteHorizontal, tap_note_horizontal, FLIP_NONE)           \
     _SPRITE(SpriteTapNoteVertical, tap_note_vertical, FLIP_NONE)               \
