@@ -1,20 +1,56 @@
-#ifndef NOTES_H
-#define NOTES_H
+#pragma once
 
 #include "Sprite.h"
 #include <gbdk/platform.h>
+#include <stdint.h>
+
+/** The number of grid rows available. */
+#define GRID_ROWS 5
+/** The number of grid columns available. */
+#define GRID_COLS 8
+/** The pixel-based x-position of the first grid cell, anchored on the left
+ * edge. */
+#define GRID_START_X 16
+/** The pixel-based y-position of the first grid cell, anchored on the top edge.
+ */
+#define GRID_START_Y 20
+
+/** The pixel-based width of a note. */
+#define NOTE_WIDTH 16
+/** The pixel-based height of a note. */
+#define NOTE_HEIGHT 16
+
+/** A note type. */
+typedef enum {
+    TapLeft,  ///< A tap note directed to the left.
+    TapRight, ///< A tap note directed to the right.
+    TapUp,    ///< A tap note directed upward.
+    TapDown,  ///< A tap note directed downward.
+    Hold,     ///< A hold note (activated with the A key). Freezes the scanline
+              ///< until the hold ends.
+    Reverse,  ///< A reverse note (activated with the B key). Reverses the
+              ///< direction of the scanline.
+} NoteType;
+
+/** A note in a map. */
+typedef struct {
+    NoteType type;          ///< The type of note.
+    uint8_t grid_idx;       ///< The map grid index to place the note.
+    uint8_t speed_modifier; ///< The speed modifier of the note.
+    uint16_t
+        appear_frame; ///< The frame on which the note will appear (0-65535).
+    uint8_t charge_frames; ///< The number of frames to wait before a note
+                           ///< should be pressed (0-255).
+    uint8_t
+        hold_frames; ///< The number of frames to hold a note for. Only applies
+                     ///< to hold notes (0-255); all other notes should take 0.
+} Note;
 
 /**
  * Displays a note on the screen using Sprite Manager
  *
- * @param note_type     Type of note to display; currently supports only
- * Horizontal and Vertical Tap Notes.
- * @param x_pos         X position on the screen.
- * @param y_pos         Y Position on the screen.
- * @param flipped       Whether a note should have the opposite click direction
- * of default.
+ * @param note  The note to display.
  *
+ * @return A pointer to the display sprite.
  */
-Sprite *note(UINT8 note_type, UINT16 x_pos, UINT16 y_pos, UINT8 flipped);
-
-#endif
+Sprite *DrawNote(Note note);

@@ -1,7 +1,5 @@
 #include "Banks/SetAutoBank.h"
 #include "Keys.h"
-#include "Maps.h"
-#include "Scroll.h"
 #include "ZGBMain.h"
 
 #define TIMER_INTERVAL 15
