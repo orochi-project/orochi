@@ -1,27 +1,13 @@
 #include "Banks/SetAutoBank.h"
+#include "MapDreamFlower.h"
 #include "Notes.h"
 #include "Scroll.h"
 #include "SpriteManager.h"
 #include "ZGBMain.h"
+#include "gb/gb.h"
+#include "gbdk/platform.h"
 
 IMPORT_MAP(map_background);
-
-// dummy notes
-static const Note notes[] = {
-    {.type = TapLeft,
-     .grid_idx = 18,
-     .speed_modifier = 0,
-     .appear_frame = 148,
-     .charge_frames = 90,
-     .hold_frames = 0},
-    {.type = TapRight,
-     .grid_idx = 25,
-     .speed_modifier = 0,
-     .appear_frame = 292,
-     .charge_frames = 90,
-     .hold_frames = 0},
-};
-#define NOTE_COUNT (sizeof(notes) / sizeof(notes[0]))
 
 static uint16_t current_frame = 0;
 static uint16_t next_note_idx = 0;
@@ -34,9 +20,11 @@ void START(void) {
 void UPDATE(void) {
     ++current_frame;
 
-    while (next_note_idx < NOTE_COUNT &&
-           current_frame >= notes[next_note_idx].appear_frame) {
-        DrawNote(notes[next_note_idx]);
+    uint16_t note_count = MapDreamFlowerGetNoteCount();
+
+    while (next_note_idx < note_count &&
+           current_frame >= MapDreamFlowerGetNote(next_note_idx).appear_frame) {
+        DrawNote(MapDreamFlowerGetNote(next_note_idx));
         ++next_note_idx;
     }
 }

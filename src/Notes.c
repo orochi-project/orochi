@@ -1,4 +1,5 @@
 #include "Notes.h"
+#include "Banks/SetAutoBank.h"
 #include "SpriteManager.h"
 #include "ZGBMain.h"
 #include <stdint.h>
