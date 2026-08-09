@@ -45,12 +45,3 @@ typedef struct {
         hold_frames; ///< The number of frames to hold a note for. Only applies
                      ///< to hold notes (0-255); all other notes should take 0.
 } Note;
-
-/**
- * Displays a note on the screen using Sprite Manager
- *
- * @param note  The note to display.
- *
- * @return A pointer to the display sprite.
- */
-Sprite *DrawNote(Note note);
