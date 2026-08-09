@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+#include "GameData.h"
 #include "Keys.h"
 #include "Maps.h"
 #include "Music.h"
@@ -17,8 +18,6 @@ IMPORT_MAP(menu_map_selector);
 IMPORT_TILES(japanese_glyphs);
 IMPORT_TILES(yarara_font_primary);
 IMPORT_TILES(yarara_font_secondary);
-
-DECLARE_MUSIC(isolation);
 
 extern const palette_color_t menu_map_selector_palettes[4];
 
@@ -56,9 +55,6 @@ static int8_t kanji_lower_typewriter_idx;
 /** The romaji typewriter index. */
 static int8_t romaji_typewriter_idx;
 
-/** The index of the currently selected map. */
-static uint8_t selected_map_idx = 0;
-
 /** The typewriter index for the map ID text. */
 static int8_t map_id_typewriter_idx = -1;
 /** The typewriter index for the map difficulty text. */
@@ -67,25 +63,27 @@ static int8_t map_difficulty_typewriter_idx = -1;
 static int8_t map_name_typewriter_idx = -1;
 
 /** Draw the logo kanji text. */
-void DrawLogoKanji(void);
+static void DrawLogoKanji(void);
 
 /** Draw the logo romaji text. */
-void DrawLogoRomaji(void);
+static void DrawLogoRomaji(void);
 
-void DrawMapLabels(void);
+/** Draw the map labels. */
+static void DrawMapLabels(void);
+
 /**
  * Draw the map selector overlay.
  *
  * @param tile_x    The starting x-tile to draw the overlay.
  * @param tile_y    The starting y-tile to draw the overlay.
  */
-void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
+static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
 
 void START(void) {
+    selected_map_idx = 0;
+
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
-
-    PlayMusic(isolation, LOOP);
 
     INIT_FONT(japanese_glyphs, PRINT_BKG);
     font_offsets.japanese_glyphs_font_offset = font_offset;
@@ -142,7 +140,7 @@ void UPDATE(void) {
     }
 }
 
-void DrawLogoKanji(void) {
+static void DrawLogoKanji(void) {
     wait_vbl_done();
 
     font_offset = font_offsets.japanese_glyphs_font_offset;
@@ -157,7 +155,7 @@ void DrawLogoKanji(void) {
     menu_checkpoint = MENU_LOGO_KANJI;
 }
 
-void DrawLogoRomaji(void) {
+static void DrawLogoRomaji(void) {
     wait_vbl_done();
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
@@ -169,7 +167,7 @@ void DrawLogoRomaji(void) {
     menu_checkpoint = MENU_LOGO_ROMAJI;
 }
 
-void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
+static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
     wait_vbl_done();
 
     uint8_t _saved_bank = CURRENT_BANK;
@@ -208,7 +206,7 @@ void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
     menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
 }
 
-void DrawMapLabels(void) {
+static void DrawMapLabels(void) {
     wait_vbl_done();
 
     ResetTypewriter(map_id_typewriter_idx);
@@ -255,6 +253,8 @@ void DrawMapLabels(void) {
 
     map_name_typewriter_idx = DrawText(map_title, 4, 10, TEXT_ANCHOR_LEFT, 3,
                                        TEXT_SECONDARY_PALETTE_IDX);
+
+    PlayCurrentMapSong();
 
     menu_checkpoint = MENU_MAP_LABELS;
 }

@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+#include "GameData.h"
 #include "MapDreamFlower.h"
 #include "Notes.h"
 #include "Scroll.h"
