@@ -21,7 +21,7 @@ static uint16_t next_note_idx = 0;
  *
  * @return A pointer to the displayed sprite.
  */
-static Sprite *DrawNote(Note note);
+static Sprite *DrawNote(const Note *note);
 
 void START(void) {
     InitScroll(BANK(map_background), &map_background, 0, 0);
@@ -32,26 +32,27 @@ void START(void) {
 void UPDATE(void) {
     ++current_frame;
 
-    uint16_t note_count = MapDreamFlowerGetNoteCount();
+    while (next_note_idx < MapDreamFlowerGetNoteCount()) {
+        Note current_note = MapDreamFlowerGetNote(next_note_idx);
+        if (current_frame < current_note.appear_frame)
+            break;
 
-    while (next_note_idx < note_count &&
-           current_frame >= MapDreamFlowerGetNote(next_note_idx).appear_frame) {
-        DrawNote(MapDreamFlowerGetNote(next_note_idx));
+        DrawNote(&current_note);
         ++next_note_idx;
     }
 }
 
-static Sprite *DrawNote(Note note) {
+static Sprite *DrawNote(const Note *note) {
     // get row/col
-    uint8_t grid_row = note.grid_idx / GRID_COLS;
-    uint8_t grid_col = note.grid_idx % GRID_COLS;
+    uint8_t grid_row = note->grid_idx / GRID_COLS;
+    uint8_t grid_col = note->grid_idx % GRID_COLS;
 
     // get xy
     uint8_t pixel_x = GRID_START_X + NOTE_WIDTH * grid_col;
     uint8_t pixel_y = GRID_START_Y + NOTE_HEIGHT * grid_row;
 
     uint8_t note_sprite_type;
-    switch (note.type) {
+    switch (note->type) {
     case TapLeft:
     case TapRight:
         note_sprite_type = SpriteTapNoteHorizontal;
@@ -69,17 +70,17 @@ static Sprite *DrawNote(Note note) {
         return NULL;
 
     // flip if needed
-    if (note.type == TapLeft) {
+    if (note->type == TapLeft) {
         note_sprite->mirror = V_MIRROR;
         note_sprite->x -= 16;
-    } else if (note.type == TapDown) {
+    } else if (note->type == TapDown) {
         note_sprite->mirror = H_MIRROR;
         note_sprite->y -= 16;
     }
 
     // set charge frames
     TapNoteData *note_data = (TapNoteData *)note_sprite->custom_data;
-    note_data->charge_frames = note.charge_frames;
+    note_data->charge_frames = note->charge_frames;
 
     return note_sprite;
 }
