@@ -56,12 +56,10 @@ static Sprite *DrawNote(Note note) {
     case TapRight:
         note_sprite_type = SpriteTapNoteHorizontal;
         break;
-
     case TapUp:
     case TapDown:
         note_sprite_type = SpriteTapNoteVertical;
         break;
-
     default:
         return NULL; // TODO: implement other notes
     }
@@ -78,6 +76,10 @@ static Sprite *DrawNote(Note note) {
         note_sprite->mirror = H_MIRROR;
         note_sprite->y -= 16;
     }
+
+    // set charge frames
+    TapNoteData *note_data = (TapNoteData *)note_sprite->custom_data;
+    note_data->charge_frames = note.charge_frames;
 
     return note_sprite;
 }

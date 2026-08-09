@@ -34,14 +34,20 @@ typedef enum {
 
 /** A note in a map. */
 typedef struct {
-    NoteType type;          ///< The type of note.
-    uint8_t grid_idx;       ///< The map grid index to place the note.
-    uint8_t speed_modifier; ///< The speed modifier of the note.
-    uint16_t
+    const NoteType type;          ///< The type of note.
+    const uint8_t grid_idx;       ///< The map grid index to place the note.
+    const uint8_t speed_modifier; ///< The speed modifier of the note.
+    const uint16_t
         appear_frame; ///< The frame on which the note will appear (0-65535).
-    uint8_t charge_frames; ///< The number of frames to wait before a note
-                           ///< should be pressed (0-255).
-    uint8_t
+    const uint8_t charge_frames; ///< The number of frames to wait before a note
+                                 ///< should be pressed (0-255).
+    const uint8_t
         hold_frames; ///< The number of frames to hold a note for. Only applies
                      ///< to hold notes (0-255); all other notes should take 0.
 } Note;
+
+/** Sprite custom data for tap notes. */
+typedef struct {
+    uint8_t charge_frames;
+    uint8_t current_frame;
+} TapNoteData;
