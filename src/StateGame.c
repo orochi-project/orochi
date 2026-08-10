@@ -63,6 +63,9 @@ static Sprite *DrawNote(const Note *note) {
     case TapDown:
         note_sprite_type = SpriteTapNoteVertical;
         break;
+    case Reverse:
+        note_sprite_type = SpriteReverseNote;
+        break;
     default:
         return NULL; // TODO: implement other notes
     }

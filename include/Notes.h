@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gbdk/platform.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /** The pixel-based width of a note. */
@@ -47,6 +48,14 @@ typedef struct {
 
 /** Sprite custom data for tap notes. */
 typedef struct {
-    uint8_t charge_frames;
-    uint8_t current_frame;
+    uint16_t charge_frames;
+    uint16_t current_frame;
 } TapNoteData;
+
+/** Sprite custom data for reverse notes. */
+typedef struct {
+    uint16_t charge_frames;
+    uint16_t current_frame;
+    bool reversed;
+    bool clicked;
+} ReverseNoteData;
