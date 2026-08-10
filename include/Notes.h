@@ -1,8 +1,12 @@
 #pragma once
 
-#include "Sprite.h"
 #include <gbdk/platform.h>
 #include <stdint.h>
+
+/** The pixel-based width of a note. */
+#define NOTE_WIDTH 16
+/** The pixel-based height of a note. */
+#define NOTE_HEIGHT 16
 
 /** The number of grid rows available. */
 #define GRID_ROWS 5
@@ -14,11 +18,6 @@
 /** The pixel-based y-position of the first grid cell, anchored on the top edge.
  */
 #define GRID_START_Y 20
-
-/** The pixel-based width of a note. */
-#define NOTE_WIDTH 16
-/** The pixel-based height of a note. */
-#define NOTE_HEIGHT 16
 
 /** A note type. */
 typedef enum {

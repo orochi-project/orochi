@@ -1,7 +1,8 @@
 #include "Banks/SetAutoBank.h"
 #include "Keys.h"
 #include "Notes.h"
-#include "ZGBMain.h"
+#include "Scanline.h"
+#include "SpriteManager.h"
 
 /** The total number of frames for this note. */
 #define NOTE_FRAME_COUNT 5

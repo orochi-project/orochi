@@ -16,5 +16,3 @@ uint8_t GetTileReplacement(uint8_t *tile_ptr, uint8_t *tile) {
 
     return 255;
 }
-
-Sprite* scanline_sprite = NULL;

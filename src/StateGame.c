@@ -1,6 +1,8 @@
 #include "Banks/SetAutoBank.h"
 #include "GameData.h"
 #include "MapDreamFlower.h"
+#include "Notes.h"
+#include "Scanline.h"
 #include "Scroll.h"
 #include "SpriteManager.h"
 #include "ZGBMain.h"
@@ -25,7 +27,7 @@ static Sprite *DrawNote(const Note *note);
 
 void START(void) {
     InitScroll(BANK(map_background), &map_background, 0, 0);
-    SpriteManagerAdd(SpriteScanline, 8, 64);
+    SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
     PlayCurrentMapSong();
 }
 
@@ -70,13 +72,10 @@ static Sprite *DrawNote(const Note *note) {
         return NULL;
 
     // flip if needed
-    if (note->type == TapLeft) {
+    if (note->type == TapLeft)
         note_sprite->mirror = V_MIRROR;
-        note_sprite->x -= 16;
-    } else if (note->type == TapDown) {
+    else if (note->type == TapDown)
         note_sprite->mirror = H_MIRROR;
-        note_sprite->y -= 16;
-    }
 
     // set charge frames
     TapNoteData *note_data = (TapNoteData *)note_sprite->custom_data;
