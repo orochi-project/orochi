@@ -25,6 +25,15 @@
  */
 #define DIV_MUL_ROUND(a, b, c) (((a) * (c) + (b) / 2) / (b))
 
+/**
+ * @def SIGN(x)
+ *
+ * Get the sign of a number.
+ *
+ * @param x The number to get the sign of.
+ */
+#define SIGN(x) (((x) > 0) - ((x) < 0))
+
 void START(void) {
     ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
     note_data->current_frame = 0;
@@ -53,6 +62,15 @@ void UPDATE(void) {
             SpriteManagerRemoveSprite(THIS);
             return;
         }
+    }
+
+    if (note_data->current_frame >= note_data->charge_frames &&
+        !note_data->speed_changed && note_data->speed_modifier) {
+        ScanlineData *scanline_data =
+            (ScanlineData *)scanline_sprite->custom_data;
+        scanline_data->velocity =
+            SIGN(scanline_data->velocity) * note_data->speed_modifier;
+        note_data->speed_changed = true;
     }
 
     // If the note collides with the scanline and the correct direction is

@@ -81,8 +81,23 @@ static Sprite *DrawNote(const Note *note) {
         note_sprite->mirror = H_MIRROR;
 
     // set charge frames
-    TapNoteData *note_data = (TapNoteData *)note_sprite->custom_data;
-    note_data->charge_frames = note->charge_frames;
+    switch (note->type) {
+    case TapLeft:
+    case TapRight:
+    case TapUp:
+    case TapDown: {
+        TapNoteData *note_data = (TapNoteData *)note_sprite->custom_data;
+        note_data->speed_modifier = note->speed_modifier;
+        note_data->charge_frames = note->charge_frames;
+        break;
+    }
+    case Reverse: {
+        ReverseNoteData *note_data =
+            (ReverseNoteData *)note_sprite->custom_data;
+        note_data->speed_modifier = note->speed_modifier;
+        note_data->charge_frames = note->charge_frames;
+    }
+    }
 
     return note_sprite;
 }

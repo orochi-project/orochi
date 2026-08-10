@@ -48,14 +48,18 @@ typedef struct {
 
 /** Sprite custom data for tap notes. */
 typedef struct {
+    uint8_t speed_modifier;
     uint16_t charge_frames;
     uint16_t current_frame;
+    bool speed_changed;
 } TapNoteData;
 
 /** Sprite custom data for reverse notes. */
 typedef struct {
+    uint8_t speed_modifier;
     uint16_t charge_frames;
     uint16_t current_frame;
+    bool speed_changed;
     bool reversed;
     bool clicked;
 } ReverseNoteData;
