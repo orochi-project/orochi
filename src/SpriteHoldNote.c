@@ -96,9 +96,8 @@ void UPDATE(void) {
     }
 
     // perfect period
-    if (note_data->current_frame >= note_data->charge_frames +
-                                        note_data->hold_frames +
-                                        NOTE_PERFECT_FRAMES) {
+    if (note_data->current_frame >=
+        note_data->charge_frames + note_data->hold_frames) {
         SpriteManagerRemoveSprite(THIS);
         return;
     }
