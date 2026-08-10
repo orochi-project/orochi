@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 /** The starting x-position of the scanline. */
-#define SCANLINE_START_X 4
+#define SCANLINE_START_X 5
 /** The starting y-position of the scanline. */
 #define SCANLINE_START_Y 8
 
