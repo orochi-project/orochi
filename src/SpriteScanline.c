@@ -3,6 +3,7 @@
 #include "SpriteManager.h"
 
 void START(void) {
+    scanline_sprite = THIS;
     ScanlineData *scanline_data = (ScanlineData *)THIS->custom_data;
     scanline_data->velocity = SCANLINE_START_VELOCITY;
 }
