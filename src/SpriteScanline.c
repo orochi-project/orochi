@@ -11,7 +11,8 @@ void START(void) {
 void UPDATE(void) {
     ScanlineData *scanline_data = (ScanlineData *)THIS->custom_data;
 
-    THIS->x += scanline_data->velocity;
+    if (!scanline_data->frozen)
+        THIS->x += scanline_data->velocity;
 
     if (THIS->x <= SCANLINE_BOUND_LEFT_X) {
         THIS->x = SCANLINE_BOUND_LEFT_X;

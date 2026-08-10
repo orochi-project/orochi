@@ -63,3 +63,12 @@ typedef struct {
     bool reversed;
     bool clicked;
 } ReverseNoteData;
+
+/** Sprite custom data for hold notes. */
+typedef struct {
+    uint8_t speed_modifier;
+    uint16_t charge_frames;
+    uint16_t current_frame;
+    uint8_t hold_frames;
+    bool speed_changed;
+} HoldNoteData;

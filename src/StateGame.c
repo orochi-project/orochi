@@ -66,6 +66,9 @@ static Sprite *DrawNote(const Note *note) {
     case Reverse:
         note_sprite_type = SpriteReverseNote;
         break;
+    case Hold:
+        note_sprite_type = SpriteHoldNote;
+        break;
     default:
         return NULL; // TODO: implement other notes
     }
@@ -96,6 +99,12 @@ static Sprite *DrawNote(const Note *note) {
             (ReverseNoteData *)note_sprite->custom_data;
         note_data->speed_modifier = note->speed_modifier;
         note_data->charge_frames = note->charge_frames;
+    }
+    case Hold: {
+        HoldNoteData *note_data = (HoldNoteData *)note_sprite->custom_data;
+        note_data->speed_modifier = note->speed_modifier;
+        note_data->charge_frames = note->charge_frames;
+        note_data->hold_frames = note->hold_frames;
     }
     }
 

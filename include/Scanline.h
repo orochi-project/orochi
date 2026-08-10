@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sprite.h"
+#include <stdbool.h>
 
 /** The starting x-position of the scanline. */
 #define SCANLINE_START_X 4
@@ -18,6 +19,7 @@
 /** Sprite custom data for the scanline. */
 typedef struct {
     int8_t velocity;
+    bool frozen;
 } ScanlineData;
 
 /** A pointer to the scanline sprite. */

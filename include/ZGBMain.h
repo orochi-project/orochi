@@ -10,6 +10,7 @@
     _SPRITE(SpriteTapNoteHorizontal, tap_note_horizontal, FLIP_NONE)           \
     _SPRITE(SpriteTapNoteVertical, tap_note_vertical, FLIP_NONE)               \
     _SPRITE(SpriteReverseNote, reverse_note, FLIP_NONE)                        \
+    _SPRITE(SpriteHoldNote, hold_note, FLIP_NONE)                              \
     SPRITE_DEF_END
 
 #include "ZGBMain_Init.h"
