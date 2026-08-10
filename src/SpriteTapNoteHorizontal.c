@@ -35,7 +35,10 @@
 
 void START(void) {
     TapNoteData *note_data = (TapNoteData *)THIS->custom_data;
+    note_data->speed_modifier = 0;
+    note_data->charge_frames = 0;
     note_data->current_frame = 0;
+    note_data->speed_changed = false;
 }
 
 void UPDATE(void) {

@@ -35,7 +35,10 @@
 
 void START(void) {
     TapNoteData *note_data = (TapNoteData *)THIS->custom_data;
+    note_data->speed_modifier = 0;
+    note_data->charge_frames = 0;
     note_data->current_frame = 0;
+    note_data->speed_changed = false;
 }
 
 void UPDATE(void) {
@@ -55,7 +58,8 @@ void UPDATE(void) {
         !note_data->speed_changed && note_data->speed_modifier) {
         ScanlineData *scanline_data =
             (ScanlineData *)scanline_sprite->custom_data;
-        scanline_data->velocity = SIGN(scanline_data->velocity) * note_data->speed_modifier;
+        scanline_data->velocity =
+            SIGN(scanline_data->velocity) * note_data->speed_modifier;
         note_data->speed_changed = true;
     }
 

@@ -36,7 +36,12 @@
 
 void START(void) {
     ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
+    note_data->speed_modifier = 0;
+    note_data->charge_frames = 0;
     note_data->current_frame = 0;
+    note_data->speed_changed = false;
+    note_data->reversed = false;
+    note_data->clicked = false;
 }
 
 void UPDATE(void) {
