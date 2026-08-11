@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+#include "GameAudio.h"
 #include "GameData.h"
 #include "MapDreamFlower.h"
 #include "Notes.h"
@@ -6,7 +7,6 @@
 #include "Scroll.h"
 #include "SpriteManager.h"
 #include "ZGBMain.h"
-#include "gbdk/platform.h"
 
 IMPORT_MAP(map_background);
 
@@ -26,7 +26,9 @@ static uint16_t next_note_idx = 0;
 static Sprite *DrawNote(const Note *note);
 
 void START(void) {
-    DISABLE_SPRITE_FLICKERING;
+    DISABLE_SPRITE_FLICKERING; // ... otherwise it looks glitchy
+
+    InitGameAudio(); // custom init
 
     InitScroll(BANK(map_background), &map_background, 0, 0);
     SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
@@ -34,13 +36,14 @@ void START(void) {
 }
 
 void UPDATE(void) {
+    TickGameAudio(); // tick manually here because CrossZGB's audio ticking is
+                     // faster than and independent of VBL updates
     ++current_frame;
 
     while (next_note_idx < MapDreamFlowerGetNoteCount()) {
         Note current_note = MapDreamFlowerGetNote(next_note_idx);
         if (current_frame < current_note.appear_frame)
             break;
-
         DrawNote(&current_note);
         ++next_note_idx;
     }
