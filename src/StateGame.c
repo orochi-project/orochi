@@ -6,13 +6,13 @@
 #include "Scroll.h"
 #include "SpriteManager.h"
 #include "ZGBMain.h"
-#include "gb/gb.h"
 #include "gbdk/platform.h"
 
 IMPORT_MAP(map_background);
 
 /** The current frame in the game. */
 static uint16_t current_frame = 0;
+
 /** The index of the next note. */
 static uint16_t next_note_idx = 0;
 
@@ -117,7 +117,6 @@ static Sprite *DrawNote(const Note *note) {
         break;
     }
     }
-    return note_sprite;
 
     return note_sprite;
 }
