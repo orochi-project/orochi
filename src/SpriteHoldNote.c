@@ -20,6 +20,7 @@
  * @def DIV_MUL_ROUND(a, b, c)
  *
  * Divide a value after multiplying it, rounding to the nearest integer.
+ * Eqivalent of rounding (ac/b).
  *
  * @param a The value to divide.
  * @param b The divisor.
@@ -57,9 +58,8 @@ void UPDATE(void) {
     } else if (note_data->current_frame <=
                note_data->charge_frames + note_data->hold_frames) {
         uint16_t note_frame =
-            DIV_MUL_ROUND(note_data->current_frame,
-                          note_data->charge_frames + note_data->hold_frames,
-                          NOTE_HOLD_FRAME_COUNT - 1) +
+            DIV_MUL_ROUND(note_data->current_frame - note_data->charge_frames,
+                          note_data->hold_frames, NOTE_HOLD_FRAME_COUNT) +
             NOTE_CHARGE_FRAME_COUNT - 1;
         SetFrame(THIS, note_frame);
     }
@@ -95,7 +95,7 @@ void UPDATE(void) {
     }
 
     // perfect period
-    if (note_data->current_frame >=
+    if (note_data->current_frame >
         note_data->charge_frames + note_data->hold_frames) {
         SpriteManagerRemoveSprite(THIS);
         return;
