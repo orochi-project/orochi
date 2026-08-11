@@ -5,23 +5,12 @@
 /**
  * The frame interval over which exactly one audio tick should be skipped.
  *
- * Theoretically, one audio tick should be skipped every 220 frame. This is
- * because of the theoretical differences between the tick rate of hUGETracker's
- * .wav export (approx. 60 Hz) and that of the actual Game Boy Color frame rate
- * (approx. 59.7275 Hz, or, more precisely, 262144 / 4389).
- *
- * The rate difference can be calculated as such: d = (60 Hz - (262144 / 4389)
- * Hz) / (60 Hz) = 0.004541657.
- *
- * Finally, the skip interval is calculated by doing: 1 / d = 1 / 0.004541657 =
- * 220.183946488 frames.
- *
  * WARN: Hardcoding this is probably not gonna be a great idea eventually.
  * TODO: Add an attribute to each map that can be passed into here (?) to allow
  * for dynamic skip intervals. (Though this would probably need a lot of manual
  * measurement/calibration.)
  */
-#define AUDIO_SKIP_INTERVAL 220
+#define AUDIO_SKIP_INTERVAL 145
 
 /** The counter to track when one audio tick must be skipped. */
 static uint8_t skip_counter = 0;
