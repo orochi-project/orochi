@@ -24,6 +24,7 @@
 #define FLAG_SNAPPED 0x02
 #define FLAG_REVERSED 0x04
 #define FLAG_CLICKED 0x08
+#define FLAG_DESTROY_PENDING 0x10
 
 /** A note type. */
 typedef enum {

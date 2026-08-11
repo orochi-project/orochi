@@ -13,6 +13,9 @@
  */
 #define NOTE_PERFECT_FRAMES 8
 
+/** The number of frames to allocate for the destruction timer. */
+#define DESTRUCTION_TIMER 30
+
 /**
  * @def DIV_MUL_ROUND(a, b, c)
  *
@@ -86,13 +89,27 @@ void UPDATE(void) {
     if (CheckCollision(THIS, scanline_sprite)) {
         if ((THIS->mirror && KEY_TICKED(J_LEFT)) ||
             (!THIS->mirror && KEY_TICKED(J_RIGHT))) {
-            SpriteManagerRemoveSprite(THIS);
+            note_data->flags |= FLAG_CLICKED;
+            THIS->y = 144;
             return;
         }
     }
 
-    // perfect period
-    if (note_data->current_frame >= note_data->charge_frames) {
+    // destruction logic
+    if (!(note_data->flags & FLAG_DESTROY_PENDING) &&
+        note_data->current_frame >= note_data->charge_frames) {
+        if (note_data->flags & FLAG_CLICKED) {
+            SpriteManagerRemoveSprite(THIS);
+            return;
+        } else {
+            note_data->flags |= FLAG_DESTROY_PENDING;
+            return;
+        }
+    }
+
+    if (note_data->flags & FLAG_DESTROY_PENDING &&
+        note_data->current_frame >=
+            note_data->charge_frames + DESTRUCTION_TIMER) {
         SpriteManagerRemoveSprite(THIS);
         return;
     }
