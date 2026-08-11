@@ -64,6 +64,22 @@ void UPDATE(void) {
         SetFrame(THIS, note_frame);
     }
 
+    // snap scanline
+    if (!(note_data->flags & FLAG_SNAPPED) &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not snapped and charge done
+        // snap x
+        scanline_sprite->x = SCANLINE_BOUND_LEFT_X + note_data->scanline_x;
+
+        // snap direction
+        if ((scanline_data->velocity < 0) !=
+            (note_data->scanline_direction < 0))
+            scanline_data->velocity = -scanline_data->velocity;
+
+        // flag as snapped
+        note_data->flags |= FLAG_SNAPPED;
+    }
+
     if ((note_data->current_frame >= note_data->charge_frames) &&
         !scanline_data->frozen) {
         scanline_data->frozen = true;
