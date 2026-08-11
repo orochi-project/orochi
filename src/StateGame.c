@@ -26,6 +26,8 @@ static uint16_t next_note_idx = 0;
 static Sprite *DrawNote(const Note *note);
 
 void START(void) {
+    DISABLE_SPRITE_FLICKERING;
+
     InitScroll(BANK(map_background), &map_background, 0, 0);
     SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
     PlayCurrentMapSong();
@@ -92,6 +94,8 @@ static Sprite *DrawNote(const Note *note) {
         TapNoteData *note_data = (TapNoteData *)note_sprite->custom_data;
         note_data->speed_modifier = note->speed_modifier;
         note_data->charge_frames = note->charge_frames;
+        note_data->scanline_x = note->scanline_x;
+        note_data->scanline_direction = note->scanline_direction;
         break;
     }
     case Reverse: {
@@ -99,6 +103,8 @@ static Sprite *DrawNote(const Note *note) {
             (ReverseNoteData *)note_sprite->custom_data;
         note_data->speed_modifier = note->speed_modifier;
         note_data->charge_frames = note->charge_frames;
+        note_data->scanline_x = note->scanline_x;
+        note_data->scanline_direction = note->scanline_direction;
         break;
     }
     case Hold: {
@@ -106,9 +112,12 @@ static Sprite *DrawNote(const Note *note) {
         note_data->speed_modifier = note->speed_modifier;
         note_data->charge_frames = note->charge_frames;
         note_data->hold_frames = note->hold_frames;
+        note_data->scanline_x = note->scanline_x;
+        note_data->scanline_direction = note->scanline_direction;
         break;
     }
     }
+    return note_sprite;
 
     return note_sprite;
 }

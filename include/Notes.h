@@ -20,6 +20,11 @@
  */
 #define GRID_START_Y 20
 
+#define FLAG_SPEED_CHANGED 0x01
+#define FLAG_SNAPPED 0x02
+#define FLAG_REVERSED 0x04
+#define FLAG_CLICKED 0x08
+
 /** A note type. */
 typedef enum {
     TapLeft,  ///< A tap note directed to the left.
@@ -34,41 +39,49 @@ typedef enum {
 
 /** A note in a map. */
 typedef struct {
-    const NoteType type;          ///< The type of note.
-    const uint8_t grid_idx;       ///< The map grid index to place the note.
-    const uint8_t speed_modifier; ///< The speed modifier of the note.
-    const uint16_t
+    NoteType type;          ///< The type of note.
+    uint8_t grid_idx;       ///< The map grid index to place the note.
+    uint8_t speed_modifier; ///< The speed modifier of the note.
+    uint16_t
         appear_frame; ///< The frame on which the note will appear (0-65535).
-    const uint8_t charge_frames; ///< The number of frames to wait before a note
-                                 ///< should be pressed (0-255).
-    const uint8_t
+    uint8_t charge_frames; ///< The number of frames to wait before a note
+                           ///< should be pressed (0-255).
+    uint8_t
         hold_frames; ///< The number of frames to hold a note for. Only applies
                      ///< to hold notes (0-255); all other notes should take 0.
+    uint8_t scanline_x; ///< The x-position of the scanline on the peak frame of
+                        ///< the note.
+    int8_t scanline_direction; ///< The direction of the scanline on the peak
+                               ///< frame of the note.
 } Note;
 
 /** Sprite custom data for tap notes. */
 typedef struct {
     uint8_t speed_modifier;
-    uint16_t charge_frames;
+    uint8_t charge_frames;
     uint16_t current_frame;
-    bool speed_changed;
+    uint8_t scanline_x;
+    int8_t scanline_direction;
+    uint8_t flags;
 } TapNoteData;
 
 /** Sprite custom data for reverse notes. */
 typedef struct {
     uint8_t speed_modifier;
-    uint16_t charge_frames;
+    uint8_t charge_frames;
     uint16_t current_frame;
-    bool speed_changed;
-    bool reversed;
-    bool clicked;
+    uint8_t scanline_x;
+    int8_t scanline_direction;
+    uint8_t flags;
 } ReverseNoteData;
 
 /** Sprite custom data for hold notes. */
 typedef struct {
     uint8_t speed_modifier;
-    uint16_t charge_frames;
-    uint16_t current_frame;
+    uint8_t charge_frames;
     uint8_t hold_frames;
-    bool speed_changed;
+    uint16_t current_frame;
+    uint8_t scanline_x;
+    int8_t scanline_direction;
+    uint8_t flags;
 } HoldNoteData;

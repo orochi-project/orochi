@@ -36,16 +36,13 @@
 
 void START(void) {
     ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
-    note_data->speed_modifier = 0;
-    note_data->charge_frames = 0;
     note_data->current_frame = 0;
-    note_data->speed_changed = false;
-    note_data->reversed = false;
-    note_data->clicked = false;
+    note_data->flags = 0x00;
 }
 
 void UPDATE(void) {
     ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
+    ScanlineData *scanline_data = (ScanlineData *)scanline_sprite->custom_data;
 
     ++note_data->current_frame;
 
@@ -57,33 +54,60 @@ void UPDATE(void) {
         SetFrame(THIS, note_frame);
     }
 
-    if (!note_data->reversed &&
-        (note_data->current_frame >= note_data->charge_frames)) {
-        ScanlineData *scanline_data =
-            (ScanlineData *)scanline_sprite->custom_data;
+    // snap scanline
+    if (!(note_data->flags & FLAG_SNAPPED) &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not snapped and charge done
+        // snap x
+        scanline_sprite->x = SCANLINE_BOUND_LEFT_X + note_data->scanline_x;
+
+        // snap direction
+        if ((scanline_data->velocity < 0) !=
+            (note_data->scanline_direction < 0))
+            scanline_data->velocity = -scanline_data->velocity;
+
+        // flag as snapped
+        note_data->flags |= FLAG_SNAPPED;
+    }
+
+    // reverse scanline
+    if (!(note_data->flags & FLAG_REVERSED) &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not reversed and charge done
         scanline_data->velocity = -scanline_data->velocity;
-        note_data->reversed = true;
-        if (note_data->clicked) {
+
+        // flag as reversed
+        note_data->flags |= FLAG_REVERSED;
+
+        if (note_data->flags &
+            FLAG_CLICKED) { // if flagged as clicked already, then remove sprite
+                            // once reversed
             SpriteManagerRemoveSprite(THIS);
             return;
         }
     }
 
-    if (note_data->current_frame >= note_data->charge_frames &&
-        !note_data->speed_changed && note_data->speed_modifier) {
-        ScanlineData *scanline_data =
-            (ScanlineData *)scanline_sprite->custom_data;
+    // speed modifier
+    if (!(note_data->flags & FLAG_SPEED_CHANGED) && note_data->speed_modifier &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not speed changed and charge done
+        // change velocity
         scanline_data->velocity =
             SIGN(scanline_data->velocity) * note_data->speed_modifier;
-        note_data->speed_changed = true;
+        // flag as speed changed
+        note_data->flags |= FLAG_SPEED_CHANGED;
     }
 
     // If the note collides with the scanline and the correct direction is
     // pressed, delete the note.
     // TODO: check for early hits
-    if (!note_data->clicked && CheckCollision(THIS, scanline_sprite) &&
-        KEY_TICKED(J_B)) {
-        note_data->clicked = true;
+    if (!(note_data->flags & FLAG_CLICKED) &&
+        CheckCollision(THIS, scanline_sprite) &&
+        KEY_TICKED(J_B)) { // if not clicked and B is ticked
+        // flag as clicked
+        // don't delete the sprite yet; otherwise it might look odd for the
+        // scanline to reverse on an empty sprite
+        note_data->flags |= FLAG_CLICKED;
         return;
     }
 

@@ -35,14 +35,13 @@
 
 void START(void) {
     TapNoteData *note_data = (TapNoteData *)THIS->custom_data;
-    note_data->speed_modifier = 0;
-    note_data->charge_frames = 0;
     note_data->current_frame = 0;
-    note_data->speed_changed = false;
+    note_data->flags = 0x00;
 }
 
 void UPDATE(void) {
     TapNoteData *note_data = (TapNoteData *)THIS->custom_data;
+    ScanlineData *scanline_data = (ScanlineData *)scanline_sprite->custom_data;
 
     ++note_data->current_frame;
 
@@ -54,13 +53,31 @@ void UPDATE(void) {
         SetFrame(THIS, note_frame);
     }
 
-    if (note_data->current_frame >= note_data->charge_frames &&
-        !note_data->speed_changed && note_data->speed_modifier) {
-        ScanlineData *scanline_data =
-            (ScanlineData *)scanline_sprite->custom_data;
+    // snap scanline
+    if (!(note_data->flags & FLAG_SNAPPED) &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not snapped and charge done
+        // snap x
+        scanline_sprite->x = SCANLINE_BOUND_LEFT_X + note_data->scanline_x;
+
+        // snap direction
+        if ((scanline_data->velocity < 0) !=
+            (note_data->scanline_direction < 0))
+            scanline_data->velocity = -scanline_data->velocity;
+
+        // flag as snapped
+        note_data->flags |= FLAG_SNAPPED;
+    }
+
+    // speed modifier
+    if (!(note_data->flags & FLAG_SPEED_CHANGED) && note_data->speed_modifier &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not speed changed and charge done
+        // change velocity
         scanline_data->velocity =
             SIGN(scanline_data->velocity) * note_data->speed_modifier;
-        note_data->speed_changed = true;
+        // flag as speed changed
+        note_data->flags |= FLAG_SPEED_CHANGED;
     }
 
     // If the note collides with the scanline and the correct direction is

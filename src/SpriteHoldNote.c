@@ -38,11 +38,8 @@
 
 void START(void) {
     HoldNoteData *note_data = (HoldNoteData *)THIS->custom_data;
-    note_data->speed_modifier = 0;
-    note_data->charge_frames = 0;
     note_data->current_frame = 0;
-    note_data->hold_frames = 0;
-    note_data->speed_changed = false;
+    note_data->flags = 0x00;
 }
 
 void UPDATE(void) {
@@ -78,20 +75,22 @@ void UPDATE(void) {
         scanline_data->frozen = false;
     }
 
-    if (note_data->current_frame >= note_data->charge_frames &&
-        !note_data->speed_changed && note_data->speed_modifier) {
-        ScanlineData *scanline_data =
-            (ScanlineData *)scanline_sprite->custom_data;
+    // speed modifier
+    if (!(note_data->flags & FLAG_SPEED_CHANGED) && note_data->speed_modifier &&
+        note_data->current_frame >=
+            note_data->charge_frames) { // if not speed changed and charge done
+        // change velocity
         scanline_data->velocity =
             SIGN(scanline_data->velocity) * note_data->speed_modifier;
-        note_data->speed_changed = true;
+        // flag as speed changed
+        note_data->flags |= FLAG_SPEED_CHANGED;
     }
 
     // If the note collides with the scanline and the correct direction is
     // pressed, delete the note.
     // TODO: check for early hits
     if (CheckCollision(THIS, scanline_sprite) && KEY_TICKED(J_A)) {
-        SpriteManagerRemoveSprite(THIS);
+        // SpriteManagerRemoveSprite(THIS);
         return;
     }
 
