@@ -12,6 +12,9 @@
 /** The total number of hold frames for this note. */
 #define NOTE_HOLD_FRAME_COUNT 4
 
+/** The index of the locked frame for this note. */
+#define NOTE_LOCKED_FRAME_IDX 9
+
 /**
  * Prevents the player from holding the note again after releasing.
  *
@@ -110,10 +113,10 @@ static void UpdateAnimation(HoldNoteData *note_data) {
             NOTE_CHARGE_FRAME_COUNT - 1;
         SetFrame(THIS, frame_idx);
     } else if (note_data->flags & FLAG_HOLD_LOCKED) {
-        SetFrame(THIS, 9);
-    } else {
+        SpriteManagerBringToFront(THIS);
+        SetFrame(THIS, NOTE_LOCKED_FRAME_IDX);
+    } else
         ++note_data->frames_missed;
-    }
 }
 
 static void CheckPlayerClick(HoldNoteData *note_data) {
