@@ -5,7 +5,8 @@
 
 uint8_t selected_map_idx;
 
-bool buffer_allowed;
+bool can_buffer;
+bool is_buffering;
 
 void PlayCurrentMapSong(void) {
     const Map *selected_map = &maps[selected_map_idx];

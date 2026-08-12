@@ -6,8 +6,15 @@
 /** The index of the currently selected map. */
 extern uint8_t selected_map_idx;
 
-/** Whether or not the player can currently buffer an upcoming hold note. */
-extern bool buffer_allowed;
+/**
+ * Whether or not the player can currently buffer an upcoming hold note.
+ *
+ * The player can only buffer if and only if the next note is a hold note.
+ */
+extern bool can_buffer;
+
+/** Whether or not the player is currently buffering the next hold note. */
+extern bool is_buffering;
 
 /** Play the song for the currently selected map. */
 void PlayCurrentMapSong(void);
