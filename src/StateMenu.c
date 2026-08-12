@@ -1,8 +1,8 @@
 #include "Banks/SetAutoBank.h"
+#include "GameAudio.h"
 #include "GameData.h"
 #include "Keys.h"
 #include "Maps.h"
-#include "Music.h"
 #include "Palette.h"
 #include "Print.h"
 #include "Scroll.h"
@@ -82,6 +82,8 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
 void START(void) {
     selected_map_idx = 0;
 
+    InitGameAudio();
+
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
 
@@ -98,6 +100,7 @@ void START(void) {
 }
 
 void UPDATE(void) {
+    TickGameAudio();
     UpdateTypewriter();
 
     // kanji done

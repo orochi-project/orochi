@@ -1,8 +1,8 @@
 #include "Banks/SetAutoBank.h"
 #include "GameAudio.h"
 #include "GameData.h"
+#include "Keys.h"
 #include "MapDreamFlower.h"
-#include "Maps.h"
 #include "Notes.h"
 #include "Scanline.h"
 #include "Scroll.h"
@@ -12,10 +12,10 @@
 IMPORT_MAP(map_background);
 
 /** The current frame in the game. */
-static uint16_t current_frame = 0;
+static uint16_t current_frame;
 
 /** The index of the next note. */
-static uint16_t next_note_idx = 0;
+static uint16_t next_note_idx;
 
 /**
  * Display a note on the screen using Sprite Manager
@@ -29,12 +29,14 @@ static Sprite *DrawNote(const Note *note);
 void START(void) {
     DISABLE_SPRITE_FLICKERING; // ... otherwise it looks glitchy
 
-    audio_skip_interval = maps[selected_map_idx].audio_skip_interval;
+    current_frame = 0;
+    next_note_idx = 0;
 
     InitGameAudio(); // custom init
 
     InitScroll(BANK(map_background), &map_background, 0, 0);
     SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
+
     PlayCurrentMapSong();
 }
 
@@ -45,11 +47,20 @@ void UPDATE(void) {
 
     while (next_note_idx < MapDreamFlowerGetNoteCount()) {
         Note current_note = MapDreamFlowerGetNote(next_note_idx);
+
         if (current_frame < current_note.appear_frame)
             break;
+
         DrawNote(&current_note);
+
         ++next_note_idx;
     }
+
+    // NOTE: This might be too obscure/hidden for the average user to figure
+    // out.
+    // TODO: Try to make a small indicator for this.
+    if (KEY_PRESSED(J_SELECT) && KEY_PRESSED(J_START))
+        SetState(StateMenu);
 }
 
 static Sprite *DrawNote(const Note *note) {
