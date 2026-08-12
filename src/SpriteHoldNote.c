@@ -13,11 +13,18 @@
 #define NOTE_HOLD_FRAME_COUNT 4
 
 /**
+ * Prevents the player from holding the note again after releasing.
+ *
+ * @param note_data A pointer to the note custom data.
+ */
+static void AddHoldLogic(HoldNoteData *note_data);
+
+/**
  * Update the charge and hold animation frames of the note.
  *
  * @param note_data A pointer to the note custom data.
  */
-static void UpdateChargeAnimation(HoldNoteData *note_data);
+static void UpdateAnimation(HoldNoteData *note_data);
 
 /**
  * Check if the player hit the note.
@@ -47,6 +54,7 @@ static bool HandleDestruction(HoldNoteData *note_data);
 void START(void) {
     HoldNoteData *note_data = (HoldNoteData *)THIS->custom_data;
     note_data->current_frame = 0;
+    note_data->frames_missed = 0;
     note_data->flags = 0x00;
 }
 
@@ -56,7 +64,8 @@ void UPDATE(void) {
 
     ++note_data->current_frame;
 
-    UpdateChargeAnimation(note_data);
+    AddHoldLogic(note_data);
+    UpdateAnimation(note_data);
     CheckPlayerClick(note_data);
     ApplyScanlineModifiers(note_data, scanline_data);
 
@@ -66,7 +75,19 @@ void UPDATE(void) {
 
 void DESTROY(void) {}
 
-static void UpdateChargeAnimation(HoldNoteData *note_data) {
+static void AddHoldLogic(HoldNoteData *note_data) {
+    if (KEY_PRESSED(J_A) && !(note_data->flags & FLAG_HOLD_LOCKED) &&
+        (note_data->current_frame >= note_data->charge_frames)) {
+        note_data->flags |= FLAG_HOLDING;
+    }
+    if (KEY_RELEASED(J_A) &&
+        (note_data->current_frame >= note_data->charge_frames)) {
+        note_data->flags &= ~FLAG_HOLDING;
+        note_data->flags |= FLAG_HOLD_LOCKED;
+    }
+}
+
+static void UpdateAnimation(HoldNoteData *note_data) {
     // If the note is still in the charging stage, calculate the note frame
     // index and set the note animation frame to that index.
     if (note_data->current_frame <= note_data->charge_frames) {
@@ -80,12 +101,18 @@ static void UpdateChargeAnimation(HoldNoteData *note_data) {
     // TODO: Only show the holding animation if the user is actually holding the
     // note.
     else if (note_data->current_frame <=
-             note_data->charge_frames + note_data->hold_frames) {
+                 note_data->charge_frames + note_data->hold_frames &&
+             (note_data->flags & FLAG_HOLDING)) {
         uint16_t frame_idx =
-            DIV_MUL_ROUND(note_data->current_frame - note_data->charge_frames,
+            DIV_MUL_ROUND(note_data->current_frame - note_data->charge_frames -
+                              note_data->frames_missed,
                           note_data->hold_frames, NOTE_HOLD_FRAME_COUNT) +
             NOTE_CHARGE_FRAME_COUNT - 1;
         SetFrame(THIS, frame_idx);
+    } else if (note_data->flags & FLAG_HOLD_LOCKED) {
+        SetFrame(THIS, 9);
+    } else {
+        ++note_data->frames_missed;
     }
 }
 

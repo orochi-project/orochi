@@ -25,6 +25,8 @@
 #define FLAG_REVERSED 0x04
 #define FLAG_CLICKED 0x08
 #define FLAG_DESTROY_PENDING 0x10
+#define FLAG_HOLDING 0x20
+#define FLAG_HOLD_LOCKED 0x40
 
 /** A note type. */
 typedef enum {
@@ -82,6 +84,7 @@ typedef struct {
     uint8_t charge_frames;
     uint8_t hold_frames;
     uint16_t current_frame;
+    uint8_t frames_missed;
     uint8_t scanline_x;
     int8_t scanline_direction;
     uint8_t flags;

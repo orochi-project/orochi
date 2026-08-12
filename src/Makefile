@@ -18,4 +18,6 @@ DEFAULT_SPRITES_SIZE = SPRITES_8x16
 # Music player: HUGETRACKER (default) or GBT_PLAYER
 MUSIC_PLAYER = HUGETRACKER
 
+CUSTOM_DATA_SIZE = 9
+
 include $(subst ',,$(subst \,/,'$(ZGB_PATH)'))/src/MakefileCommon
