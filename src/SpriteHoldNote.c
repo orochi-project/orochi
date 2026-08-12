@@ -30,13 +30,6 @@ static void CheckHold(HoldNoteData *note_data);
 static void UpdateAnimation(HoldNoteData *note_data);
 
 /**
- * Check if the player hit the note.
- *
- * @param note_data A pointer to the note custom data.
- */
-static void CheckPlayerClick(HoldNoteData *note_data);
-
-/**
  * Apply scanline modifiers for the note.
  *
  * @param note_data     A pointer to the note custom data.
@@ -69,7 +62,6 @@ void UPDATE(void) {
 
     CheckHold(note_data);
     UpdateAnimation(note_data);
-    CheckPlayerClick(note_data);
     ApplyScanlineModifiers(note_data, scanline_data);
 
     if (HandleDestruction(note_data))
@@ -117,19 +109,6 @@ static void UpdateAnimation(HoldNoteData *note_data) {
         SetFrame(THIS, NOTE_LOCKED_FRAME_IDX);
     } else
         ++note_data->frames_missed;
-}
-
-static void CheckPlayerClick(HoldNoteData *note_data) {
-    // If the note was not already clicked and was just ticked this frame, move
-    // the note off-screen and flag the note as clicked to prevent any later
-    // clicks on this note from registering.
-    if (!(note_data->flags & FLAG_CLICKED) &&
-        CheckCollision(THIS, scanline_sprite) && KEY_TICKED(J_A)) {
-        note_data->flags |= FLAG_CLICKED;
-        // NOTE: This is temporary. There is no hold logic yet. This only
-        // detects if the note was ticked.
-        // TODO: Handle hold release.
-    }
 }
 
 static void ApplyScanlineModifiers(HoldNoteData *note_data,
