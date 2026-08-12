@@ -20,7 +20,7 @@
  *
  * @param note_data A pointer to the note custom data.
  */
-static void AddHoldLogic(HoldNoteData *note_data);
+static void CheckHold(HoldNoteData *note_data);
 
 /**
  * Update the charge and hold animation frames of the note.
@@ -67,7 +67,7 @@ void UPDATE(void) {
 
     ++note_data->current_frame;
 
-    AddHoldLogic(note_data);
+    CheckHold(note_data);
     UpdateAnimation(note_data);
     CheckPlayerClick(note_data);
     ApplyScanlineModifiers(note_data, scanline_data);
@@ -78,7 +78,7 @@ void UPDATE(void) {
 
 void DESTROY(void) {}
 
-static void AddHoldLogic(HoldNoteData *note_data) {
+static void CheckHold(HoldNoteData *note_data) {
     if (KEY_PRESSED(J_A) && !(note_data->flags & FLAG_HOLD_LOCKED) &&
         (note_data->current_frame >= note_data->charge_frames)) {
         note_data->flags |= FLAG_HOLDING;
