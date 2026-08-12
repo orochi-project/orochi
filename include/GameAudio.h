@@ -1,7 +1,12 @@
 #pragma once
 
-#include <gbdk/platform.h>
+#include <stdint.h>
 
-void InitGameAudio(void) NONBANKED;
+/** The frame interval over which exactly one audio tick should be skipped. */
+extern uint16_t audio_skip_interval;
 
-void TickGameAudio(void) NONBANKED;
+/** Initialize the audio for the game. */
+void InitGameAudio(void);
+
+/** Step forward by one tick in the currently loaded audio. */
+void TickGameAudio(void);

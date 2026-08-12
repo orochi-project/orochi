@@ -2,6 +2,7 @@
 #include "GameAudio.h"
 #include "GameData.h"
 #include "MapDreamFlower.h"
+#include "Maps.h"
 #include "Notes.h"
 #include "Scanline.h"
 #include "Scroll.h"
@@ -27,6 +28,8 @@ static Sprite *DrawNote(const Note *note);
 
 void START(void) {
     DISABLE_SPRITE_FLICKERING; // ... otherwise it looks glitchy
+
+    audio_skip_interval = maps[selected_map_idx].audio_skip_interval;
 
     InitGameAudio(); // custom init
 

@@ -11,11 +11,13 @@
 
 /** A single map. */
 typedef struct {
-    const uint8_t id;                     ///< The map ID/number.
-    const char name[MAP_NAME_MAX_LENGTH]; ///< The name of the map.
-    const uint8_t difficulty;             ///< The difficulty of the map (1-5).
-    const hUGESong_t *song;
-    const uint8_t song_bank;
+    uint8_t id;                     ///< The map ID/number.
+    char name[MAP_NAME_MAX_LENGTH]; ///< The name of the map.
+    uint8_t difficulty;             ///< The difficulty of the map (1-5).
+    hUGESong_t *song;               ///< The song to play for the map.
+    uint8_t song_bank;              ///< The song's ROM bank.
+    uint16_t audio_skip_interval; ///< The frame interval over which exactly one
+                                  ///< audio tick should be skipped.
 } Map;
 
 /** The list of maps in the game. */
