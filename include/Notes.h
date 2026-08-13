@@ -27,6 +27,7 @@
 #define FLAG_DESTROY_PENDING 0x10
 #define FLAG_HOLDING 0x20
 #define FLAG_HOLD_LOCKED 0x40
+#define FLAG_ARMED 0x80
 
 /** A note type. */
 typedef enum {

@@ -71,14 +71,24 @@ void UPDATE(void) {
 void DESTROY(void) {}
 
 static void CheckHold(HoldNoteData *note_data) {
-    if (KEY_PRESSED(J_A) && !(note_data->flags & FLAG_HOLD_LOCKED) &&
-        (note_data->current_frame >= note_data->charge_frames)) {
+    if (note_data->flags & FLAG_HOLD_LOCKED)
+        return;
+
+    bool passed_charging_stage =
+        note_data->current_frame >= note_data->charge_frames;
+
+    if (KEY_TICKED(J_A))
+        note_data->flags |= FLAG_ARMED;
+
+    if ((note_data->flags & FLAG_ARMED) && passed_charging_stage)
         note_data->flags |= FLAG_HOLDING;
-    }
-    if (KEY_RELEASED(J_A) &&
-        (note_data->current_frame >= note_data->charge_frames)) {
-        note_data->flags &= ~FLAG_HOLDING;
-        note_data->flags |= FLAG_HOLD_LOCKED;
+
+    if (KEY_RELEASED(J_A)) {
+        note_data->flags &= ~FLAG_ARMED;
+        if (passed_charging_stage) {
+            note_data->flags &= ~FLAG_HOLDING;
+            note_data->flags |= FLAG_HOLD_LOCKED;
+        }
     }
 }
 
@@ -93,8 +103,6 @@ static void UpdateAnimation(HoldNoteData *note_data) {
     }
     // If the note is in the holding stage, calculate the hold frame index and
     // set the note animation frame to that index.
-    // TODO: Only show the holding animation if the user is actually holding the
-    // note.
     else if (note_data->current_frame <=
                  note_data->charge_frames + note_data->hold_frames &&
              (note_data->flags & FLAG_HOLDING)) {
@@ -154,10 +162,9 @@ static bool HandleDestruction(HoldNoteData *note_data) {
     if (note_data->current_frame >
         note_data->charge_frames + note_data->hold_frames) {
         SpriteManagerRemoveSprite(THIS);
+
         return true;
     }
-
-    // TODO: Check if the user held the note.
 
     return false;
 }

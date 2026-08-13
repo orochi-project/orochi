@@ -5,9 +5,6 @@
 
 uint8_t selected_map_idx;
 
-bool can_buffer;
-bool is_buffering;
-
 void PlayCurrentMapSong(void) {
     const Map *selected_map = &maps[selected_map_idx];
     audio_skip_interval = selected_map->audio_skip_interval;
