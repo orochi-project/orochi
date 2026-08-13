@@ -85,7 +85,8 @@ static void CheckHold(HoldNoteData *note_data) {
 
     if (KEY_RELEASED(J_A)) {
         note_data->flags &= ~FLAG_NOTE_HOLD_ARMED;
-        if (passed_charging_stage) {
+
+        if (note_data->flags & FLAG_NOTE_HOLDING) {
             note_data->flags &= ~FLAG_NOTE_HOLDING;
             note_data->flags |= FLAG_NOTE_HOLD_LOCKED;
         }
