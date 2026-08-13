@@ -17,14 +17,14 @@
  *
  * @param note_data A pointer to the note custom data.
  */
-static void UpdateChargeAnimation(TapNoteData *note_data);
+static void UpdateChargeAnimation(ReverseNoteData *note_data);
 
 /**
  * Check if the player hit the note.
  *
  * @param note_data A pointer to the note custom data.
  */
-static void CheckPlayerClick(TapNoteData *note_data);
+static void CheckPlayerClick(ReverseNoteData *note_data);
 
 /**
  * Apply scanline modifiers for the note.
@@ -32,7 +32,7 @@ static void CheckPlayerClick(TapNoteData *note_data);
  * @param note_data     A pointer to the note custom data.
  * @param scanline_data A pointer to the scanline custom data.
  */
-static void ApplyScanlineModifiers(TapNoteData *note_data,
+static void ApplyScanlineModifiers(ReverseNoteData *note_data,
                                    ScanlineData *scanline_data);
 
 /**
@@ -42,16 +42,16 @@ static void ApplyScanlineModifiers(TapNoteData *note_data,
  *
  * @return Whether or not the sprite was destroyed.
  */
-static bool HandleDestruction(TapNoteData *note_data);
+static bool HandleDestruction(ReverseNoteData *note_data);
 
 void START(void) {
-    TapNoteData *note_data = (TapNoteData *)THIS->custom_data;
+    ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
     note_data->current_frame = 0;
     note_data->flags = 0x00;
 }
 
 void UPDATE(void) {
-    TapNoteData *note_data = (TapNoteData *)THIS->custom_data;
+    ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
     ScanlineData *scanline_data = (ScanlineData *)scanline_sprite->custom_data;
 
     ++note_data->current_frame;
@@ -66,7 +66,7 @@ void UPDATE(void) {
 
 void DESTROY(void) {}
 
-static void UpdateChargeAnimation(TapNoteData *note_data) {
+static void UpdateChargeAnimation(ReverseNoteData *note_data) {
     // If the note is still in the charging stage, calculate the note frame
     // index and set the note animation frame to that index.
     if (note_data->current_frame <= note_data->charge_frames) {
@@ -77,24 +77,18 @@ static void UpdateChargeAnimation(TapNoteData *note_data) {
     }
 }
 
-static void CheckPlayerClick(TapNoteData *note_data) {
+static void CheckPlayerClick(ReverseNoteData *note_data) {
     // If the note was not already clicked and was just ticked this frame, move
     // the note off-screen and flag the note as clicked to prevent any later
     // clicks on this note from registering.
     if (!(note_data->flags & FLAG_NOTE_HIT) &&
-        CheckCollision(THIS, scanline_sprite)) {
-        bool is_mirrored = (THIS->mirror != 0);
-        bool correct_key_pressed =
-            is_mirrored ? KEY_TICKED(J_LEFT) : KEY_TICKED(J_RIGHT);
-
-        if (correct_key_pressed) {
-            note_data->flags |= FLAG_NOTE_HIT;
-            THIS->y = 144; // move below visible screen
-        }
+        CheckCollision(THIS, scanline_sprite) && KEY_TICKED(J_B)) {
+        THIS->y = 144; // move below visible screen
+        note_data->flags |= FLAG_NOTE_HIT;
     }
 }
 
-static void ApplyScanlineModifiers(TapNoteData *note_data,
+static void ApplyScanlineModifiers(ReverseNoteData *note_data,
                                    ScanlineData *scanline_data) {
     // The scanline should only ever be modified after the note has passed its
     // charging stage.
@@ -111,10 +105,18 @@ static void ApplyScanlineModifiers(TapNoteData *note_data,
         note_data->flags |= FLAG_SCANLINE_SNAPPED;
     }
 
+    // If we did not reverse the direction of the scanline before, reverse it
+    // now.
+    if (!(note_data->flags & FLAG_SCANLINE_REVERSED)) {
+        scanline_data->velocity = -scanline_data->velocity;
+        note_data->flags |= FLAG_SCANLINE_REVERSED;
+    }
+
     // If we did not already change the velocity of the scanline to the note's
     // speed modifier, change it now.
     // If the note's speed modifier is 0 (or anything falsy), do not modify the
-    // scanline's velocity. The scanline's direction stays the same.
+    // scanline's velocity.
+    // The scanline's direction stays the same.
     if (!(note_data->flags & FLAG_SCANLINE_SPEED_CHANGED) &&
         note_data->speed_modifier) {
         scanline_data->velocity =
@@ -123,11 +125,12 @@ static void ApplyScanlineModifiers(TapNoteData *note_data,
     }
 }
 
-static bool HandleDestruction(TapNoteData *note_data) {
+static bool HandleDestruction(ReverseNoteData *note_data) {
     if (note_data->current_frame < note_data->charge_frames)
         return false;
 
     // If the note was clicked, destroy the note.
+    // TODO: Handle early clicks and misses.
     if (note_data->flags & FLAG_NOTE_HIT) {
         SpriteManagerRemoveSprite(THIS);
         return true;

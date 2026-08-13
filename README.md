@@ -89,7 +89,7 @@ nix develop
 
 > [!NOTE]
 > You might get an error about the format of the `flake.nix` file. To fix this, enter the command:
-> 
+>
 > ```bash
 > sed -i 's/\r$//' flake.nix
 > ```
