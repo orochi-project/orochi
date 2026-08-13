@@ -4,12 +4,24 @@
 #include "Keys.h"
 #include "MapDreamFlower.h"
 #include "Notes.h"
+#include "Print.h"
 #include "Scanline.h"
 #include "Scroll.h"
 #include "SpriteManager.h"
+#include "Text.h"
 #include "ZGBMain.h"
 
 IMPORT_MAP(map_background);
+
+IMPORT_TILES(mangrove_font_utility);
+
+/** Represents the stored font offsets for all loaded game fonts. */
+typedef struct {
+    int8_t mangrove_font_utility_font_offset;
+} FontOffset;
+
+/** The saved game font offsets. */
+static FontOffset font_offsets;
 
 /** The current frame in the game. */
 static uint16_t current_frame;
@@ -18,13 +30,27 @@ static uint16_t current_frame;
 static uint16_t next_note_idx;
 
 /**
- * Display a note on the screen using Sprite Manager
+ * Display a note on the screen using Sprite Manager.
  *
  * @param note  The note to display.
  *
  * @return A pointer to the displayed sprite.
  */
 static Sprite *DrawNote(const Note *note);
+
+/**
+ * Draw the performance indicator, healthbar, and health points.
+ */
+static void DrawHUD(void);
+
+/**
+ * Converts a string that contains numbers to characters that can be read and
+ * displayed as healh bars.
+ *
+ * @param player_health Current player health as a string.
+ *
+ */
+static char *HealthBar(char *player_health);
 
 void START(void) {
     DISABLE_SPRITE_FLICKERING; // ... otherwise it looks glitchy
@@ -35,6 +61,10 @@ void START(void) {
     InitGameAudio(); // custom init
 
     InitScroll(BANK(map_background), &map_background, 0, 0);
+
+    INIT_FONT(mangrove_font_utility, PRINT_BKG);
+    font_offsets.mangrove_font_utility_font_offset = font_offset;
+
     SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
 
     PlayCurrentMapSong();
@@ -56,6 +86,7 @@ void UPDATE(void) {
         ++next_note_idx;
     }
 
+    DrawHUD();
     // NOTE: This might be too obscure/hidden for the average user to figure
     // out.
     // TODO: Try to make a small indicator for this.
@@ -136,4 +167,27 @@ static Sprite *DrawNote(const Note *note) {
     }
 
     return note_sprite;
+}
+
+static void DrawHUD(void) {
+    wait_vbl_done();
+
+    font_offset = font_offsets.mangrove_font_utility_font_offset;
+
+    DrawText("PERFECT", 1, 16, TEXT_ANCHOR_LEFT, 0, TEXT_UTILITY_PALETTE_IDX);
+    DrawText(HealthBar("66662"), 9, 16, TEXT_ANCHOR_LEFT, 0,
+             TEXT_UTILITY_PALETTE_IDX);
+    DrawText("1000", 15, 16, TEXT_ANCHOR_LEFT, 0, TEXT_UTILITY_PALETTE_IDX);
+}
+
+static char *HealthBar(char *player_health) {
+
+    static char translated_string[6] = "     ";
+    char translator[] = "!'()-.:";
+    for (uint8_t i = 0; i < strlen(player_health); ++i) {
+        translated_string[i] =
+            translator[player_health[i] - '0']; // Converts string value to
+                                                // literal numerical value.
+    }
+    return translated_string;
 }
