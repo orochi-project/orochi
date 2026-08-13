@@ -71,23 +71,23 @@ void UPDATE(void) {
 void DESTROY(void) {}
 
 static void CheckHold(HoldNoteData *note_data) {
-    if (note_data->flags & FLAG_HOLD_LOCKED)
+    if (note_data->flags & FLAG_NOTE_HOLD_LOCKED)
         return;
 
     bool passed_charging_stage =
         note_data->current_frame >= note_data->charge_frames;
 
     if (KEY_TICKED(J_A))
-        note_data->flags |= FLAG_ARMED;
+        note_data->flags |= FLAG_NOTE_HOLD_ARMED;
 
-    if ((note_data->flags & FLAG_ARMED) && passed_charging_stage)
-        note_data->flags |= FLAG_HOLDING;
+    if ((note_data->flags & FLAG_NOTE_HOLD_ARMED) && passed_charging_stage)
+        note_data->flags |= FLAG_NOTE_HOLDING;
 
     if (KEY_RELEASED(J_A)) {
-        note_data->flags &= ~FLAG_ARMED;
+        note_data->flags &= ~FLAG_NOTE_HOLD_ARMED;
         if (passed_charging_stage) {
-            note_data->flags &= ~FLAG_HOLDING;
-            note_data->flags |= FLAG_HOLD_LOCKED;
+            note_data->flags &= ~FLAG_NOTE_HOLDING;
+            note_data->flags |= FLAG_NOTE_HOLD_LOCKED;
         }
     }
 }
@@ -105,14 +105,14 @@ static void UpdateAnimation(HoldNoteData *note_data) {
     // set the note animation frame to that index.
     else if (note_data->current_frame <=
                  note_data->charge_frames + note_data->hold_frames &&
-             (note_data->flags & FLAG_HOLDING)) {
+             (note_data->flags & FLAG_NOTE_HOLDING)) {
         uint16_t frame_idx =
             DIV_MUL_ROUND(note_data->current_frame - note_data->charge_frames -
                               note_data->frames_missed,
                           note_data->hold_frames, NOTE_HOLD_FRAME_COUNT) +
             NOTE_CHARGE_FRAME_COUNT - 1;
         SetFrame(THIS, frame_idx);
-    } else if (note_data->flags & FLAG_HOLD_LOCKED) {
+    } else if (note_data->flags & FLAG_NOTE_HOLD_LOCKED) {
         SpriteManagerBringToFront(THIS);
         SetFrame(THIS, NOTE_LOCKED_FRAME_IDX);
     } else
@@ -128,12 +128,12 @@ static void ApplyScanlineModifiers(HoldNoteData *note_data,
 
     // If the scanline was not already snapped to the note's assigned scanline
     // x-position and direction, snap it now.
-    if (!(note_data->flags & FLAG_SNAPPED)) {
+    if (!(note_data->flags & FLAG_SCANLINE_SNAPPED)) {
         scanline_sprite->x = SCANLINE_BOUND_LEFT_X + note_data->scanline_x;
         if ((scanline_data->velocity < 0) !=
             (note_data->scanline_direction < 0))
             scanline_data->velocity = -scanline_data->velocity;
-        note_data->flags |= FLAG_SNAPPED;
+        note_data->flags |= FLAG_SCANLINE_SNAPPED;
     }
 
     // Freeze the scanline while the hold note is active.
@@ -150,10 +150,11 @@ static void ApplyScanlineModifiers(HoldNoteData *note_data,
     // speed modifier, change it now.
     // If the note's speed modifier is 0 (or anything falsy), do not modify the
     // scanline's velocity. The scanline's direction stays the same.
-    if (!(note_data->flags & FLAG_SPEED_CHANGED) && note_data->speed_modifier) {
+    if (!(note_data->flags & FLAG_SCANLINE_SPEED_CHANGED) &&
+        note_data->speed_modifier) {
         scanline_data->velocity =
             SIGN(scanline_data->velocity) * note_data->speed_modifier;
-        note_data->flags |= FLAG_SPEED_CHANGED;
+        note_data->flags |= FLAG_SCANLINE_SPEED_CHANGED;
     }
 }
 

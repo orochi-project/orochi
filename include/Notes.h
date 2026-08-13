@@ -20,14 +20,32 @@
  */
 #define GRID_START_Y 20
 
-#define FLAG_SPEED_CHANGED 0x01
-#define FLAG_SNAPPED 0x02
-#define FLAG_REVERSED 0x04
-#define FLAG_CLICKED 0x08
-#define FLAG_DESTROY_PENDING 0x10
-#define FLAG_HOLDING 0x20
-#define FLAG_HOLD_LOCKED 0x40
-#define FLAG_ARMED 0x80
+/** Whether or not the scanline's velocity has been changed to the note's speed
+ * modifier. */
+#define FLAG_SCANLINE_SPEED_CHANGED 0x01
+/** Whether or not the scanline has already been snapped to the note's assigned
+ * x-position and direction. */
+#define FLAG_SCANLINE_SNAPPED 0x02
+/** Whether or not the scanline's direction/orientation has been reversed. */
+#define FLAG_SCANLINE_REVERSED 0x04
+/** Whether or not the player successfully hit the note. */
+#define FLAG_NOTE_HIT 0x08
+/** Whether or not the note has been flagged for destruction after being missed.
+ *
+ * The note remains on screen for a short duration once this is set as a visual
+ * cue that the note was missed. */
+#define FLAG_NOTE_PENDING_DESTRUCTION 0x10
+/** Whether or not the hold note is currently in its active holding state. */
+#define FLAG_NOTE_HOLDING 0x20
+/**
+ * Whether or not the hold note's hold has ended.
+ *
+ * The hold note cannot re-enter an active hold when this flag is set.
+ */
+#define FLAG_NOTE_HOLD_LOCKED 0x40
+/** Whether or not this note is armed to start holding as soon as it's able to.
+ */
+#define FLAG_NOTE_HOLD_ARMED 0x80
 
 /** A note type. */
 typedef enum {
