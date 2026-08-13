@@ -77,7 +77,7 @@ static void DrawMapLabels(void);
  * @param tile_x    The starting x-tile to draw the overlay.
  * @param tile_y    The starting y-tile to draw the overlay.
  */
-static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
+static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED;
 
 void START(void) {
     selected_map_idx = 0;
@@ -138,8 +138,22 @@ void UPDATE(void) {
                 selected_map_idx = MAP_COUNT - 1;
 
             DrawMapLabels();
-        } else if (KEY_TICKED(J_START))
-            SetState(StateGame);
+        } else if (KEY_TICKED(J_START)) {
+            uint8_t selected_map_state;
+            // TODO: Add all states here once all maps are done.
+            switch (selected_map_idx) {
+            case 0:
+                selected_map_state = StateMapKomorebi;
+                break;
+            case 1:
+            case 2:
+            case 3:
+            default:
+                selected_map_state = StateMapDreamFlower;
+                break;
+            }
+            SetState(selected_map_state);
+        }
     }
 }
 
@@ -170,7 +184,7 @@ static void DrawLogoRomaji(void) {
     menu_checkpoint = MENU_LOGO_ROMAJI;
 }
 
-static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
+static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
     wait_vbl_done();
 
     uint8_t _saved_bank = CURRENT_BANK;

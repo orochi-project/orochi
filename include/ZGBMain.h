@@ -2,7 +2,8 @@
 
 #define STATES                                                                 \
     _STATE(StateMenu)                                                          \
-    _STATE(StateGame)                                                          \
+    _STATE(StateMapKomorebi)                                                   \
+    _STATE(StateMapDreamFlower)                                                \
     STATE_DEF_END
 
 #define SPRITES                                                                \
