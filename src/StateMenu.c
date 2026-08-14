@@ -140,22 +140,8 @@ void UPDATE(void) {
                 selected_map_idx = MAP_COUNT - 1;
 
             DrawMapLabels();
-        } else if (KEY_TICKED(J_START)) {
-            uint8_t selected_map_state;
-            // TODO: Add all states here once all maps are done.
-            switch (selected_map_idx) {
-            case 0:
-                selected_map_state = StateMapKomorebi;
-                break;
-            case 1:
-            case 2:
-            case 3:
-            default:
-                selected_map_state = StateMapDreamFlower;
-                break;
-            }
-            SetState(selected_map_state);
-        }
+        } else if (KEY_TICKED(J_START))
+            SetState(StateGame);
     }
 }
 

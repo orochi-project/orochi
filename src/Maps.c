@@ -1,4 +1,6 @@
 #include "Maps.h"
+#include "MapDreamFlower.h"
+#include "MapKomorebi.h"
 #include "Music.h"
 
 DECLARE_MUSIC(komorebi);
@@ -14,6 +16,9 @@ const Map maps[MAP_COUNT] = {
         .song = &komorebi_uge,
         .song_bank = (uint8_t)&__bank_komorebi_uge,
         .audio_skip_interval = 145,
+        .notes = map_komorebi_notes,
+        .note_count = MAP_KOMOREBI_NOTE_COUNT,
+        .notes_bank = (uint8_t)&__bank_map_komorebi,
     },
     {
         .id = 1,
@@ -22,6 +27,9 @@ const Map maps[MAP_COUNT] = {
         .song = &dream_flower_uge,
         .song_bank = (uint8_t)&__bank_dream_flower_uge,
         .audio_skip_interval = 145,
+        .notes = map_dream_flower_notes,
+        .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
+        .notes_bank = (uint8_t)&__bank_map_dream_flower,
     },
     {
         .id = 2,
@@ -30,6 +38,9 @@ const Map maps[MAP_COUNT] = {
         .song = &thirdboot_uge,
         .song_bank = (uint8_t)&__bank_thirdboot_uge,
         .audio_skip_interval = 145,
+        .notes = map_dream_flower_notes,
+        .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
+        .notes_bank = (uint8_t)&__bank_map_dream_flower,
     },
     {
         .id = 3,
@@ -38,5 +49,19 @@ const Map maps[MAP_COUNT] = {
         .song = &isolation_uge,
         .song_bank = (uint8_t)&__bank_isolation_uge,
         .audio_skip_interval = 145,
+        .notes = map_dream_flower_notes,
+        .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
+        .notes_bank = (uint8_t)&__bank_map_dream_flower,
     },
 };
+
+Note GetMapNote(const Note *notes, uint8_t notes_bank, uint16_t note_idx) {
+    uint8_t _saved_bank = CURRENT_BANK;
+    SWITCH_ROM(notes_bank);
+
+    Note note = notes[note_idx];
+
+    SWITCH_ROM(_saved_bank);
+
+    return note;
+}
