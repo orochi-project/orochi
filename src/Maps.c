@@ -1,5 +1,6 @@
 #include "Maps.h"
 #include "MapDreamFlower.h"
+#include "MapIsolation.h"
 #include "MapKomorebi.h"
 #include "Music.h"
 
@@ -49,9 +50,9 @@ const Map maps[MAP_COUNT] = {
         .song = &isolation_uge,
         .song_bank = (uint8_t)&__bank_isolation_uge,
         .audio_skip_interval = 145,
-        .notes = map_dream_flower_notes,
-        .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
-        .notes_bank = (uint8_t)&__bank_map_dream_flower,
+        .notes = map_isolation_notes,
+        .note_count = MAP_ISOLATION_NOTE_COUNT,
+        .notes_bank = (uint8_t)&__bank_map_isolation,
     },
 };
 
