@@ -7,6 +7,7 @@
 #include "Print.h"
 #include "Scanline.h"
 #include "Scroll.h"
+#include "Sound.h"
 #include "SpriteManager.h"
 #include "Text.h"
 #include "ZGBMain.h"
@@ -60,7 +61,7 @@ void START(void) {
     hit_grade_label_timer = 0;
 
     InitGameAudio(); // custom init
-                     //
+
     InitScroll(BANK(map_background), &map_background, 0, 0);
 
     INIT_FONT(mangrove_font_utility, PRINT_BKG);
@@ -75,9 +76,23 @@ void START(void) {
 
 void UPDATE(void) {
     ++current_frame;
+    UpdateTypewriter();
+
+    // NOTE: This might be too obscure/hidden for the average user to figure
+    // out.
+    // TODO: Try to make a small indicator for this.
+    if (KEY_PRESSED(J_SELECT) && KEY_PRESSED(J_START))
+        SetState(StateMenu);
+
+    // End the song after the last frame.
+    // TODO: Show the win screen.
+    if (current_frame > current_map->frame_count) {
+        sfx_sound_cut();
+        return;
+    }
+
     TickGameAudio(); // tick manually here because CrossZGB's audio ticking is
                      // faster than and independent of VBL updates
-    UpdateTypewriter();
 
     while (next_note_idx < current_map->note_count) {
         Note current_note = GetMapNote(current_map->notes,
@@ -92,11 +107,6 @@ void UPDATE(void) {
     }
 
     DrawHUD();
-    // NOTE: This might be too obscure/hidden for the average user to figure
-    // out.
-    // TODO: Try to make a small indicator for this.
-    if (KEY_PRESSED(J_SELECT) && KEY_PRESSED(J_START))
-        SetState(StateMenu);
 }
 
 static Sprite *DrawNote(const Note *note) {

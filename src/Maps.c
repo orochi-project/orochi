@@ -20,6 +20,7 @@ const Map maps[MAP_COUNT] = {
         .notes = map_komorebi_notes,
         .note_count = MAP_KOMOREBI_NOTE_COUNT,
         .notes_bank = (uint8_t)&__bank_map_komorebi,
+        .frame_count = MAP_KOMOREBI_FRAME_COUNT,
     },
     {
         .id = 1,
@@ -31,6 +32,7 @@ const Map maps[MAP_COUNT] = {
         .notes = map_dream_flower_notes,
         .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
         .notes_bank = (uint8_t)&__bank_map_dream_flower,
+        .frame_count = MAP_DREAM_FLOWER_FRAME_COUNT,
     },
     {
         .id = 2,
@@ -42,6 +44,7 @@ const Map maps[MAP_COUNT] = {
         .notes = map_dream_flower_notes,
         .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
         .notes_bank = (uint8_t)&__bank_map_dream_flower,
+        .frame_count = MAP_DREAM_FLOWER_FRAME_COUNT,
     },
     {
         .id = 3,
@@ -53,6 +56,7 @@ const Map maps[MAP_COUNT] = {
         .notes = map_isolation_notes,
         .note_count = MAP_ISOLATION_NOTE_COUNT,
         .notes_bank = (uint8_t)&__bank_map_isolation,
+        .frame_count = MAP_ISOLATION_FRAME_COUNT,
     },
 };
 

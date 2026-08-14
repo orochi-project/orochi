@@ -23,6 +23,7 @@ typedef struct {
     uint16_t note_count;          ///< The number of notes in the map.
     uint8_t
         notes_bank; ///< The bank in which the notes for the map are located.
+    uint16_t frame_count; ///< The total number of frames in the map.
 } Map;
 
 /** The list of maps in the game. */
