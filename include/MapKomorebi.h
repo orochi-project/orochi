@@ -3,7 +3,7 @@
 #include "Notes.h"
 #include "gbdk/platform.h"
 
-#define MAP_KOMOREBI_NOTE_COUNT 106
+#define MAP_KOMOREBI_NOTE_COUNT 104
 
 BANKREF_EXTERN(map_komorebi)
 
