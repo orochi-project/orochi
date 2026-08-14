@@ -7,6 +7,10 @@ uint8_t selected_map_idx;
 
 uint16_t player_health;
 
+NoteHitGrade latest_hit_grade;
+
+bool should_draw_hit_grade_label;
+
 void PlayCurrentMapSong(void) {
     const Map *selected_map = &maps[selected_map_idx];
     audio_skip_interval = selected_map->audio_skip_interval;

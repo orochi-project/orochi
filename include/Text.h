@@ -57,3 +57,6 @@ bool TypewriterIsDone(uint8_t typewriter_idx);
  * @param typewriter_idx    The typewriter index to reset.
  */
 void ResetTypewriter(uint8_t typewriter_idx);
+
+/** Reset all active typewriter effects. */
+void ResetAllTypewriters(void);

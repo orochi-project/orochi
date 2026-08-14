@@ -116,3 +116,8 @@ void ResetTypewriter(uint8_t typewriter_idx) {
     typewriters[typewriter_idx].character_idx = 0;
     typewriters[typewriter_idx].timer = 0;
 }
+
+void ResetAllTypewriters(void) {
+    for (uint8_t i = 0; i < MAX_TYPEWRITERS; ++i)
+        typewriters[i].active = false;
+}

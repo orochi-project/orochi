@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+#include "GameData.h"
 #include "Keys.h"
 #include "MathUtils.h"
 #include "Notes.h"
@@ -7,10 +8,16 @@
 #include <stdbool.h>
 
 /** The total number of frames for this note. */
-#define NOTE_FRAME_COUNT 5
+#define NOTE_CHARGE_FRAME_COUNT 5
 
 /** The number of frames to allocate for the destruction timer. */
 #define DESTRUCTION_FRAMES 30
+
+/**
+ * The number of frames after the note is charged before which a hit is marked
+ * late.
+ */
+#define NOTE_HIT_LATE_THRESHOLD_FRAMES 5
 
 /**
  * Update the charge animation frame of the note.
@@ -72,26 +79,43 @@ static void UpdateChargeAnimation(TapNoteData *note_data) {
     if (note_data->current_frame <= note_data->charge_frames) {
         uint16_t frame_idx =
             DIV_MUL_ROUND(note_data->current_frame, note_data->charge_frames,
-                          NOTE_FRAME_COUNT - 1);
+                          NOTE_CHARGE_FRAME_COUNT - 1);
         SetFrame(THIS, frame_idx);
     }
 }
 
 static void CheckPlayerClick(TapNoteData *note_data) {
+    if ((note_data->flags & FLAG_NOTE_HIT) ||
+        !CheckCollision(THIS, scanline_sprite))
+        return;
+
     // If the note was not already clicked and was just ticked this frame, move
     // the note off-screen and flag the note as clicked to prevent any later
     // clicks on this note from registering.
-    if (!(note_data->flags & FLAG_NOTE_HIT) &&
-        CheckCollision(THIS, scanline_sprite)) {
-        bool is_mirrored = (THIS->mirror != 0);
-        bool correct_key_pressed =
-            is_mirrored ? KEY_TICKED(J_LEFT) : KEY_TICKED(J_RIGHT);
+    bool is_mirrored = (THIS->mirror != 0);
+    bool correct_key_pressed =
+        is_mirrored ? KEY_TICKED(J_LEFT) : KEY_TICKED(J_RIGHT);
 
-        if (correct_key_pressed) {
-            note_data->flags |= FLAG_NOTE_HIT;
-            THIS->y = 144; // move below visible screen
-        }
-    }
+    if (!correct_key_pressed)
+        return;
+
+    // If the note was hit past the lateness threshold, it was hit late.
+    if (note_data->current_frame >
+        note_data->charge_frames + NOTE_HIT_LATE_THRESHOLD_FRAMES)
+        latest_hit_grade = HitLate;
+    // If the note was not hit past the lateness threshold, but was correctly
+    // hit when the note was on its final frame, mark it as a perfect hit.
+    else if (THIS->anim_frame == NOTE_CHARGE_FRAME_COUNT - 1)
+        latest_hit_grade = HitPerfect;
+    // Otherwise, if the note was hit before its final frame, mark it as an
+    // early hit.
+    else
+        latest_hit_grade = HitEarly;
+
+    should_draw_hit_grade_label = true;
+
+    note_data->flags |= FLAG_NOTE_HIT;
+    THIS->y = 144; // move below visible screen
 }
 
 static void ApplyScanlineModifiers(TapNoteData *note_data,
@@ -135,13 +159,20 @@ static bool HandleDestruction(TapNoteData *note_data) {
 
     // If the note was not clicked, but it has passed the charging stage, flag
     // the note as pending destruction.
-    if (!(note_data->flags & FLAG_NOTE_PENDING_DESTRUCTION))
+    if (!(note_data->flags & FLAG_NOTE_PENDING_DESTRUCTION)) {
         note_data->flags |= FLAG_NOTE_PENDING_DESTRUCTION;
+        return false;
+    }
+
     // If the note has passed its charging stage, is already flagged as pending,
     // and has passed the destruction-pending stage, destroy the note.
-    else if (note_data->current_frame >=
-             note_data->charge_frames + DESTRUCTION_FRAMES) {
+    if (note_data->current_frame >=
+        note_data->charge_frames + DESTRUCTION_FRAMES) {
         SpriteManagerRemoveSprite(THIS);
+
+        latest_hit_grade = HitMiss;
+        should_draw_hit_grade_label = true;
+
         return true;
     }
 

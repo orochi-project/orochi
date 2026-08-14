@@ -86,6 +86,7 @@ void START(void) {
 
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
+    ResetAllTypewriters();
 
     INIT_FONT(japanese_glyphs, PRINT_BKG);
     font_offsets.japanese_glyphs_font_offset = font_offset;
@@ -220,9 +221,7 @@ static void DrawMapLabels(void) {
     ResetTypewriter(map_difficulty_typewriter_idx);
     ResetTypewriter(map_name_typewriter_idx);
 
-    static unsigned char empty_filler[13];
-    memset(empty_filler, ' ', 12); // 12 spaces
-    empty_filler[12] = '\0';
+    static unsigned char empty_filler[13] = "            "; // 12 spaces
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
 

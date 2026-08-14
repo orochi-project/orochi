@@ -15,6 +15,8 @@ IMPORT_MAP(map_background);
 
 IMPORT_TILES(mangrove_font_utility);
 
+#define HIT_GRADE_LABEL_DURATION 120;
+
 /** Represents the stored font offsets for all loaded game fonts. */
 typedef struct {
     int8_t mangrove_font_utility_font_offset;
@@ -32,6 +34,9 @@ static uint16_t current_frame;
 /** The index of the next note. */
 static uint16_t next_note_idx;
 
+/** The countdown to when the hit grade label should automatically clear. */
+static uint8_t hit_grade_label_timer;
+
 /**
  * Display a note on the screen using Sprite Manager.
  *
@@ -46,24 +51,16 @@ static Sprite *DrawNote(const Note *note);
  */
 static void DrawHUD(void);
 
-/**
- * Converts a string that contains numbers to characters that can be read and
- * displayed as healh bars.
- *
- * @param player_health Current player health as a string.
- *
- */
-static char *HealthBar(char *player_health);
-
 void START(void) {
     DISABLE_SPRITE_FLICKERING; // ... otherwise it looks glitchy
 
     current_map = &maps[selected_map_idx];
     current_frame = 0;
     next_note_idx = 0;
+    hit_grade_label_timer = 0;
 
     InitGameAudio(); // custom init
-
+                     //
     InitScroll(BANK(map_background), &map_background, 0, 0);
 
     INIT_FONT(mangrove_font_utility, PRINT_BKG);
@@ -71,13 +68,16 @@ void START(void) {
 
     SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
 
+    ResetAllTypewriters();
+
     PlayCurrentMapSong();
 }
 
 void UPDATE(void) {
+    ++current_frame;
     TickGameAudio(); // tick manually here because CrossZGB's audio ticking is
                      // faster than and independent of VBL updates
-    ++current_frame;
+    UpdateTypewriter();
 
     while (next_note_idx < current_map->note_count) {
         Note current_note = GetMapNote(current_map->notes,
@@ -175,24 +175,41 @@ static Sprite *DrawNote(const Note *note) {
 }
 
 static void DrawHUD(void) {
-    wait_vbl_done();
-
     font_offset = font_offsets.mangrove_font_utility_font_offset;
 
-    DrawText("PERFECT", 1, 16, TEXT_ANCHOR_LEFT, 0, TEXT_UTILITY_PALETTE_IDX);
-    DrawText(HealthBar("66662"), 9, 16, TEXT_ANCHOR_LEFT, 0,
-             TEXT_UTILITY_PALETTE_IDX);
-    DrawText("1000", 15, 16, TEXT_ANCHOR_LEFT, 0, TEXT_UTILITY_PALETTE_IDX);
-}
+    if (should_draw_hit_grade_label) {
+        DrawText((const unsigned char *)"       ", 1, 16, TEXT_ANCHOR_LEFT, 0,
+                 TEXT_UTILITY_PALETTE_IDX);
 
-static char *HealthBar(char *player_health) {
+        const char *grade_label;
 
-    static char translated_string[6] = "     ";
-    char translator[] = "!'()-.:";
-    for (uint8_t i = 0; i < strlen(player_health); ++i) {
-        translated_string[i] =
-            translator[player_health[i] - '0']; // Converts string value to
-                                                // literal numerical value.
+        switch (latest_hit_grade) {
+        case HitPerfect:
+            grade_label = "PERFECT";
+            break;
+        case HitEarly:
+            grade_label = "EARLY";
+            break;
+        case HitLate:
+            grade_label = "LATE";
+            break;
+        case HitMiss:
+            grade_label = "MISS";
+            break;
+        }
+
+        DrawText((const unsigned char *)grade_label, 1, 16, TEXT_ANCHOR_LEFT, 1,
+                 TEXT_UTILITY_PALETTE_IDX);
+
+        should_draw_hit_grade_label = false;
+        hit_grade_label_timer = HIT_GRADE_LABEL_DURATION;
     }
-    return translated_string;
+
+    if (hit_grade_label_timer > 0)
+        if (--hit_grade_label_timer == 0)
+            DrawText((const unsigned char *)"       ", 1, 16, TEXT_ANCHOR_LEFT,
+                     1, TEXT_UTILITY_PALETTE_IDX);
+
+    DrawText("!", 15, 16, TEXT_ANCHOR_RIGHT, 0, TEXT_UTILITY_PALETTE_IDX);
+    DrawText("1000", 19, 16, TEXT_ANCHOR_RIGHT, 0, TEXT_UTILITY_PALETTE_IDX);
 }
