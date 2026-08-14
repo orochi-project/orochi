@@ -1,8 +1,8 @@
 #include "Banks/SetAutoBank.h"
-#include "GameAudio.h"
 #include "GameData.h"
 #include "Keys.h"
 #include "Maps.h"
+#include "Music.h"
 #include "Palette.h"
 #include "Print.h"
 #include "Scroll.h"
@@ -18,6 +18,8 @@ IMPORT_MAP(menu_map_selector);
 IMPORT_TILES(japanese_glyphs);
 IMPORT_TILES(yarara_font_primary);
 IMPORT_TILES(yarara_font_secondary);
+
+DECLARE_MUSIC(mellow);
 
 extern const palette_color_t menu_map_selector_palettes[4];
 
@@ -82,8 +84,6 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED;
 void START(void) {
     selected_map_idx = 0;
 
-    InitGameAudio();
-
     // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
 
@@ -96,11 +96,13 @@ void START(void) {
     INIT_FONT(yarara_font_secondary, PRINT_BKG);
     font_offsets.yarara_font_secondary_font_offset = font_offset;
 
+    // BUG: After exiting a map, the menu music does not play again.
+    // TODO: Fix the aforementioned music bug.
+
     DrawLogoKanji();
 }
 
 void UPDATE(void) {
-    TickGameAudio();
     UpdateTypewriter();
 
     // kanji done
@@ -220,6 +222,8 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
 
     SWITCH_ROM(_saved_bank);
 
+    PlayMusic(mellow, 1);
+
     menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
 }
 
@@ -270,8 +274,6 @@ static void DrawMapLabels(void) {
 
     map_name_typewriter_idx = DrawText(map_title, 4, 10, TEXT_ANCHOR_LEFT, 3,
                                        TEXT_SECONDARY_PALETTE_IDX);
-
-    PlayCurrentMapSong();
 
     menu_checkpoint = MENU_MAP_LABELS;
 }
