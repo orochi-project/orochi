@@ -119,10 +119,8 @@ static void UpdateAnimation(HoldNoteData *note_data) {
                           note_data->hold_frames, NOTE_HOLD_FRAME_COUNT) +
             NOTE_CHARGE_FRAME_COUNT - 1;
         SetFrame(THIS, frame_idx);
-    } else if (note_data->flags & FLAG_NOTE_HOLD_LOCKED) {
-        SpriteManagerBringToFront(THIS);
+    } else if (note_data->flags & FLAG_NOTE_HOLD_LOCKED)
         SetFrame(THIS, NOTE_LOCKED_FRAME_IDX);
-    }
 }
 
 static void ApplyScanlineModifiers(HoldNoteData *note_data,
