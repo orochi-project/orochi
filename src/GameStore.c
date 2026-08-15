@@ -1,7 +1,8 @@
-#include "GameStore.h"
 #include "Banks/SetAutoBank.h"
+
 #include "GameAudio.h"
 #include "GameData.h"
+#include "GameStore.h"
 #include "Maps.h"
 #include "Music.h"
 

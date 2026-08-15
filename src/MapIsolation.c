@@ -1,5 +1,6 @@
-#include "MapIsolation.h"
 #include "Banks/SetAutoBank.h"
+
+#include "MapIsolation.h"
 
 BANKREF(map_isolation)
 

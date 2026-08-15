@@ -1,5 +1,6 @@
-#include "MapKomorebi.h"
 #include "Banks/SetAutoBank.h"
+
+#include "MapKomorebi.h"
 
 BANKREF(map_komorebi)
 

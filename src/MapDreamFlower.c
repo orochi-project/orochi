@@ -1,5 +1,6 @@
-#include "MapDreamFlower.h"
 #include "Banks/SetAutoBank.h"
+
+#include "MapDreamFlower.h"
 
 BANKREF(map_dream_flower)
 

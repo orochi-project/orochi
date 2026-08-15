@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+
 #include "GameStore.h"
 #include "Keys.h"
 #include "MathUtils.h"

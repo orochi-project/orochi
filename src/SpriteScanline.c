@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+
 #include "Scanline.h"
 #include "SpriteManager.h"
 
