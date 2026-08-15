@@ -10,9 +10,9 @@ void InitGameAudio(void) {
     sfx_sound_init();
     sfx_sound_cut();
 
+    skip_counter = 0;
+
     CRITICAL {
-        // CrossZGB's default INIT_MUSIC() in main.c already sets up the timer.
-        // We must override it in order to use our own flags.
         TAC_REG = 0x00;       // stop timer
         IE_REG &= ~TIM_IFLAG; // disable timer interrupt mask
         IF_REG &= ~TIM_IFLAG; // clear timer interrupts
