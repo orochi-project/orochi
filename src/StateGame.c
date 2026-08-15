@@ -1,6 +1,7 @@
 #include "Banks/SetAutoBank.h"
 #include "GameAudio.h"
 #include "GameData.h"
+#include "GameStore.h"
 #include "Keys.h"
 #include "Maps.h"
 #include "Notes.h"
@@ -11,6 +12,8 @@
 #include "SpriteManager.h"
 #include "Text.h"
 #include "ZGBMain.h"
+#include <stdlib.h>
+#include <string.h>
 
 IMPORT_MAP(map_background);
 
@@ -38,6 +41,9 @@ static uint16_t next_note_idx;
 /** The countdown to when the hit grade label should automatically clear. */
 static uint8_t hit_grade_label_timer;
 
+/** The last accuracy percentage drawn to the HUD. */
+static uint8_t last_drawn_accuracy_percent;
+
 /**
  * Display a note on the screen using Sprite Manager.
  *
@@ -59,6 +65,9 @@ void START(void) {
     current_frame = 0;
     next_note_idx = 0;
     hit_grade_label_timer = 0;
+    last_drawn_accuracy_percent = 255;
+
+    ResetAccuracy();
 
     InitGameAudio(); // custom init
 
@@ -188,7 +197,7 @@ static void DrawHUD(void) {
     font_offset = font_offsets.mangrove_font_utility_font_offset;
 
     if (should_draw_hit_grade_label) {
-        DrawText((const unsigned char *)"       ", 1, 16, TEXT_ANCHOR_LEFT, 0,
+        DrawText((const unsigned char *)"       ", 19, 16, TEXT_ANCHOR_RIGHT, 0,
                  TEXT_UTILITY_PALETTE_IDX);
 
         const char *grade_label;
@@ -208,8 +217,8 @@ static void DrawHUD(void) {
             break;
         }
 
-        DrawText((const unsigned char *)grade_label, 1, 16, TEXT_ANCHOR_LEFT, 1,
-                 TEXT_UTILITY_PALETTE_IDX);
+        DrawText((const unsigned char *)grade_label, 19, 16, TEXT_ANCHOR_RIGHT,
+                 1, TEXT_UTILITY_PALETTE_IDX);
 
         should_draw_hit_grade_label = false;
         hit_grade_label_timer = HIT_GRADE_LABEL_DURATION;
@@ -217,9 +226,28 @@ static void DrawHUD(void) {
 
     if (hit_grade_label_timer > 0)
         if (--hit_grade_label_timer == 0)
-            DrawText((const unsigned char *)"       ", 1, 16, TEXT_ANCHOR_LEFT,
-                     1, TEXT_UTILITY_PALETTE_IDX);
+            DrawText((const unsigned char *)"       ", 19, 16,
+                     TEXT_ANCHOR_RIGHT, 1, TEXT_UTILITY_PALETTE_IDX);
 
-    DrawText("!", 15, 16, TEXT_ANCHOR_RIGHT, 0, TEXT_UTILITY_PALETTE_IDX);
-    DrawText("1000", 19, 16, TEXT_ANCHOR_RIGHT, 0, TEXT_UTILITY_PALETTE_IDX);
+    // draw the accuracy icon once on the first frame
+    if (current_frame == 1)
+        DrawText((const unsigned char *)"!", 1, 16, TEXT_ANCHOR_LEFT, 0,
+                 TEXT_UTILITY_PALETTE_IDX);
+
+    uint8_t accuracy_percent = GetAccuracyPercent();
+    if (accuracy_percent != last_drawn_accuracy_percent) {
+        char accuracy_label[5];
+        itoa(accuracy_percent, accuracy_label, 10);
+
+        const uint8_t digit_count = strlen(accuracy_label);
+        accuracy_label[digit_count] = '('; // % symbol
+        accuracy_label[digit_count + 1] = '\0';
+
+        DrawText((const unsigned char *)"    ", 2, 16, TEXT_ANCHOR_LEFT, 0,
+                 TEXT_UTILITY_PALETTE_IDX);
+        DrawText((const unsigned char *)accuracy_label, 2, 16, TEXT_ANCHOR_LEFT,
+                 0, TEXT_UTILITY_PALETTE_IDX);
+
+        last_drawn_accuracy_percent = accuracy_percent;
+    }
 }

@@ -1,5 +1,5 @@
 #include "Banks/SetAutoBank.h"
-#include "GameData.h"
+#include "GameStore.h"
 #include "Keys.h"
 #include "MathUtils.h"
 #include "Notes.h"
@@ -169,14 +169,12 @@ static bool HandleDestruction(HoldNoteData *note_data) {
         SpriteManagerRemoveSprite(THIS);
 
         if (note_data->flags & FLAG_NOTE_HOLDING)
-            latest_hit_grade = THIS->anim_frame == NOTE_CHARGE_FRAME_COUNT +
-                                                       NOTE_HOLD_FRAME_COUNT - 1
-                                   ? HitPerfect
-                                   : HitLate;
+            RegisterNoteHit(THIS->anim_frame == NOTE_CHARGE_FRAME_COUNT +
+                                                    NOTE_HOLD_FRAME_COUNT - 1
+                                ? HitPerfect
+                                : HitLate);
         else
-            latest_hit_grade = HitMiss;
-
-        should_draw_hit_grade_label = true;
+            RegisterNoteHit(HitMiss);
 
         return true;
     }

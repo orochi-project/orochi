@@ -1,5 +1,5 @@
 #include "Banks/SetAutoBank.h"
-#include "GameData.h"
+#include "GameStore.h"
 #include "Keys.h"
 #include "MathUtils.h"
 #include "Notes.h"
@@ -94,13 +94,11 @@ static void CheckPlayerClick(ReverseNoteData *note_data) {
     // clicks on this note from registering.
     if (note_data->current_frame >
         note_data->charge_frames + NOTE_HIT_LATE_THRESHOLD_FRAMES)
-        latest_hit_grade = HitLate;
+        RegisterNoteHit(HitLate);
     else if (THIS->anim_frame == NOTE_FRAME_COUNT - 1)
-        latest_hit_grade = HitPerfect;
+        RegisterNoteHit(HitPerfect);
     else
-        latest_hit_grade = HitEarly;
-
-    should_draw_hit_grade_label = true;
+        RegisterNoteHit(HitEarly);
 
     THIS->y = 144;
     note_data->flags |= FLAG_NOTE_HIT;
@@ -164,8 +162,7 @@ static bool HandleDestruction(ReverseNoteData *note_data) {
              note_data->charge_frames + DESTRUCTION_FRAMES) {
         SpriteManagerRemoveSprite(THIS);
 
-        latest_hit_grade = HitMiss;
-        should_draw_hit_grade_label = true;
+        RegisterNoteHit(HitMiss);
 
         return true;
     }

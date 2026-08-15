@@ -1,5 +1,6 @@
 #include "Banks/SetAutoBank.h"
 #include "GameData.h"
+#include "GameStore.h"
 #include "Keys.h"
 #include "MathUtils.h"
 #include "Notes.h"
@@ -102,15 +103,17 @@ static void CheckPlayerClick(TapNoteData *note_data) {
     // If the note was hit past the lateness threshold, it was hit late.
     if (note_data->current_frame >
         note_data->charge_frames + NOTE_HIT_LATE_THRESHOLD_FRAMES)
-        latest_hit_grade = HitLate;
+        RegisterNoteHit(HitLate);
     // If the note was not hit past the lateness threshold, but was correctly
     // hit when the note was on its final frame, mark it as a perfect hit.
     else if (THIS->anim_frame == NOTE_CHARGE_FRAME_COUNT - 1)
-        latest_hit_grade = HitPerfect;
+        RegisterNoteHit(HitPerfect);
     // Otherwise, if the note was hit before its final frame, mark it as an
     // early hit.
     else
-        latest_hit_grade = HitEarly;
+        RegisterNoteHit(HitEarly);
+
+    note_data->flags |= FLAG_NOTE_HIT;
 
     should_draw_hit_grade_label = true;
 
@@ -170,8 +173,7 @@ static bool HandleDestruction(TapNoteData *note_data) {
         note_data->charge_frames + DESTRUCTION_FRAMES) {
         SpriteManagerRemoveSprite(THIS);
 
-        latest_hit_grade = HitMiss;
-        should_draw_hit_grade_label = true;
+        RegisterNoteHit(HitMiss);
 
         return true;
     }
