@@ -1,4 +1,5 @@
 #include "Banks/SetAutoBank.h"
+#include "GameAudio.h"
 #include "GameData.h"
 #include "Keys.h"
 #include "Maps.h"
@@ -84,7 +85,8 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED;
 void START(void) {
     selected_map_idx = 0;
 
-    // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
+    RestoreDefaultAudio();
+
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
     ResetAllTypewriters();
 
@@ -96,9 +98,6 @@ void START(void) {
 
     INIT_FONT(yarara_font_secondary, PRINT_BKG);
     font_offsets.yarara_font_secondary_font_offset = font_offset;
-
-    // BUG: After exiting a map, the menu music does not play again.
-    // TODO: Fix the aforementioned music bug.
 
     DrawLogoKanji();
 }

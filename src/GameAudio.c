@@ -23,6 +23,14 @@ void InitGameAudio(void) {
     INIT_MUSIC_DRIVER();
 }
 
+void RestoreDefaultAudio(void) {
+    CRITICAL {
+        TAC_REG = 0x04;
+        IF_REG &= ~TIM_IFLAG;
+        set_interrupts(IE_REG | TIM_IFLAG);
+    }
+}
+
 void TickGameAudio(void) {
     if (music_paused)
         return;
