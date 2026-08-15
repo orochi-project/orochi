@@ -150,12 +150,15 @@ static void DrawLogoKanji(void) {
 
     font_offset = font_offsets.japanese_glyphs_font_offset;
 
+    static unsigned char kanji_upper_label[] = "ABEF";
+    static unsigned char kanji_lower_label[] = "CDGH";
+
     kanji_upper_typewriter_idx =
-        DrawText((const unsigned char *)"ABEF", 4, 1, TEXT_ANCHOR_LEFT, 10,
-                 TEXT_PRIMARY_PALETTE_IDX); // upper half of 大蛇
+        DrawText(kanji_upper_label, 4, 1, TEXT_ANCHOR_LEFT, 10,
+                 TEXT_PRIMARY_PALETTE_IDX);
     kanji_lower_typewriter_idx =
-        DrawText((const unsigned char *)"CDGH", 4, 2, TEXT_ANCHOR_LEFT, 10,
-                 TEXT_PRIMARY_PALETTE_IDX); // lower half of 大蛇
+        DrawText(kanji_lower_label, 4, 2, TEXT_ANCHOR_LEFT, 10,
+                 TEXT_PRIMARY_PALETTE_IDX);
 
     menu_checkpoint = MENU_LOGO_KANJI;
 }
@@ -165,9 +168,10 @@ static void DrawLogoRomaji(void) {
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
 
-    romaji_typewriter_idx =
-        DrawText((const unsigned char *)"OROCHI!", 9, 2, TEXT_ANCHOR_LEFT, 8,
-                 TEXT_PRIMARY_PALETTE_IDX);
+    static unsigned char romaji_label[] = "OROCHI!";
+
+    romaji_typewriter_idx = DrawText(romaji_label, 9, 2, TEXT_ANCHOR_LEFT, 8,
+                                     TEXT_PRIMARY_PALETTE_IDX);
 
     menu_checkpoint = MENU_LOGO_ROMAJI;
 }
@@ -220,12 +224,13 @@ static void DrawMapLabels(void) {
     ResetTypewriter(map_difficulty_typewriter_idx);
     ResetTypewriter(map_name_typewriter_idx);
 
-    static unsigned char empty_filler[13] = "            "; // 12 spaces
+    static unsigned char empty_filler_label[13] = "            "; // 12 spaces
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
 
     // clear old map ID and difficulty
-    DrawText(empty_filler, 4, 7, TEXT_ANCHOR_LEFT, 0, TEXT_PRIMARY_PALETTE_IDX);
+    DrawText(empty_filler_label, 4, 7, TEXT_ANCHOR_LEFT, 0,
+             TEXT_PRIMARY_PALETTE_IDX);
 
     const Map *selected_map = &maps[selected_map_idx];
 
@@ -247,7 +252,7 @@ static void DrawMapLabels(void) {
     font_offset = font_offsets.yarara_font_secondary_font_offset;
 
     // clear old map name
-    DrawText(empty_filler, 4, 10, TEXT_ANCHOR_LEFT, 0,
+    DrawText(empty_filler_label, 4, 10, TEXT_ANCHOR_LEFT, 0,
              TEXT_SECONDARY_PALETTE_IDX);
 
     static unsigned char map_title[MAP_NAME_MAX_LENGTH];

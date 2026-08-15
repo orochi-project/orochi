@@ -196,24 +196,29 @@ static Sprite *DrawNote(const Note *note) {
 static void DrawHUD(void) {
     font_offset = font_offsets.mangrove_font_utility_font_offset;
 
+    static unsigned char grade_filler_label[] = "       "; // 7 spaces
+    static unsigned char accuracy_icon_label[] = "!";
+    static unsigned char accuracy_filler_label[] = "    "; // 4 spaces
+
     if (should_draw_hit_grade_label) {
-        DrawText((const unsigned char *)"       ", 19, 16, TEXT_ANCHOR_RIGHT, 0,
+        DrawText(grade_filler_label, 19, 16, TEXT_ANCHOR_RIGHT, 0,
                  TEXT_UTILITY_PALETTE_IDX);
 
-        const char *grade_label;
+        static unsigned char grade_label[8];
 
         switch (latest_hit_grade) {
         case HitPerfect:
-            grade_label = "PERFECT";
+            strcpy((char *)grade_label, "PERFECT");
             break;
         case HitEarly:
-            grade_label = "EARLY";
+            strcpy((char *)grade_label, "EARLY");
             break;
         case HitLate:
-            grade_label = "LATE";
+            strcpy((char *)grade_label, "LATE");
             break;
         case HitMiss:
-            grade_label = "MISS";
+        default:
+            strcpy((char *)grade_label, "MISS");
             break;
         }
 
@@ -226,12 +231,12 @@ static void DrawHUD(void) {
 
     if (hit_grade_label_timer > 0)
         if (--hit_grade_label_timer == 0)
-            DrawText((const unsigned char *)"       ", 19, 16,
-                     TEXT_ANCHOR_RIGHT, 1, TEXT_UTILITY_PALETTE_IDX);
+            DrawText(grade_filler_label, 19, 16, TEXT_ANCHOR_RIGHT, 1,
+                     TEXT_UTILITY_PALETTE_IDX);
 
     // draw the accuracy icon once on the first frame
     if (current_frame == 1)
-        DrawText((const unsigned char *)"!", 1, 16, TEXT_ANCHOR_LEFT, 0,
+        DrawText(accuracy_icon_label, 1, 16, TEXT_ANCHOR_LEFT, 0,
                  TEXT_UTILITY_PALETTE_IDX);
 
     uint8_t accuracy_percent = GetAccuracyPercent();
@@ -243,7 +248,7 @@ static void DrawHUD(void) {
         accuracy_label[digit_count] = '('; // % symbol
         accuracy_label[digit_count + 1] = '\0';
 
-        DrawText((const unsigned char *)"    ", 2, 16, TEXT_ANCHOR_LEFT, 0,
+        DrawText(accuracy_filler_label, 2, 16, TEXT_ANCHOR_LEFT, 0,
                  TEXT_UTILITY_PALETTE_IDX);
         DrawText((const unsigned char *)accuracy_label, 2, 16, TEXT_ANCHOR_LEFT,
                  0, TEXT_UTILITY_PALETTE_IDX);
