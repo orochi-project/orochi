@@ -3,6 +3,18 @@
 #include "Notes.h"
 #include <stdint.h>
 
+/** Play the song for the currently selected map. */
+void PlayCurrentMapSong(void) BANKED;
+
+/** Initialize the audio for the game. */
+void InitGameAudio(void) BANKED;
+
+/** Restore the default CrossZGB music settings. */
+void RestoreDefaultAudio(void) BANKED;
+
+/** Step forward by one tick in the currently loaded audio. */
+void TickGameAudio(void) NONBANKED;
+
 /**
  * Record a note's hit grade.
  *
@@ -23,6 +35,3 @@ void ResetAccuracy(void) BANKED;
  * @return  The accuracy percentage, from 0 to 100.
  */
 uint8_t GetAccuracyPercent(void) BANKED;
-
-/** Play the song for the currently selected map. */
-void PlayCurrentMapSong(void) BANKED;
