@@ -116,17 +116,8 @@ static void ApplyScanlineModifiers(ReverseNoteData *note_data,
     // x-position and direction, snap it now.
     if (!(note_data->flags & FLAG_SCANLINE_SNAPPED)) {
         scanline_sprite->x = SCANLINE_BOUND_LEFT_X + note_data->scanline_x;
-        if ((scanline_data->velocity < 0) !=
-            (note_data->scanline_direction < 0))
-            scanline_data->velocity = -scanline_data->velocity;
+        scanline_data->velocity = -scanline_data->velocity; // reverse scanline
         note_data->flags |= FLAG_SCANLINE_SNAPPED;
-    }
-
-    // If we did not reverse the direction of the scanline before, reverse it
-    // now.
-    if (!(note_data->flags & FLAG_SCANLINE_REVERSED)) {
-        scanline_data->velocity = -scanline_data->velocity;
-        note_data->flags |= FLAG_SCANLINE_REVERSED;
     }
 
     // If we did not already change the velocity of the scanline to the note's

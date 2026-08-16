@@ -26,17 +26,15 @@
 /** Whether or not the scanline has already been snapped to the note's assigned
  * x-position and direction. */
 #define FLAG_SCANLINE_SNAPPED 0x02
-/** Whether or not the scanline's direction/orientation has been reversed. */
-#define FLAG_SCANLINE_REVERSED 0x04
 /** Whether or not the player successfully hit the note. */
-#define FLAG_NOTE_HIT 0x08
+#define FLAG_NOTE_HIT 0x04
 /** Whether or not the note has been flagged for destruction after being missed.
  *
  * The note remains on screen for a short duration once this is set as a visual
  * cue that the note was missed. */
-#define FLAG_NOTE_PENDING_DESTRUCTION 0x10
+#define FLAG_NOTE_PENDING_DESTRUCTION 0x8
 /** Whether or not the hold note is currently in its active holding state. */
-#define FLAG_NOTE_HOLDING 0x20
+#define FLAG_NOTE_HOLDING 0x10
 /**
  * Whether or not the hold note's hold has ended.
  *
