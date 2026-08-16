@@ -1,7 +1,7 @@
 #include "Banks/SetAutoBank.h"
 
-#include "GameAudio.h"
 #include "GameData.h"
+#include "GameStore.h"
 #include "Keys.h"
 #include "Maps.h"
 #include "Music.h"
@@ -10,7 +10,6 @@
 #include "Scroll.h"
 #include "Text.h"
 #include "ZGBMain.h"
-#include "gb/gb.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -47,24 +46,24 @@ typedef struct {
     int8_t yarara_font_secondary_font_offset;
 } FontOffset;
 
+/** The current menu state. */
+static MenuCheckpoint menu_checkpoint;
+
 /** The saved menu font offsets. */
 static FontOffset font_offsets;
 
-/** The current menu state. */
-static MenuCheckpoint menu_checkpoint;
 /** The upper kanji typewriter index. */
 static int8_t kanji_upper_typewriter_idx;
 /** The lower kanji typewriter index. */
 static int8_t kanji_lower_typewriter_idx;
 /** The romaji typewriter index. */
 static int8_t romaji_typewriter_idx;
-
 /** The typewriter index for the map ID text. */
-static int8_t map_id_typewriter_idx = -1;
+static int8_t map_id_typewriter_idx;
 /** The typewriter index for the map difficulty text. */
-static int8_t map_difficulty_typewriter_idx = -1;
+static int8_t map_difficulty_typewriter_idx;
 /** The typewriter index for the map name text. */
-static int8_t map_name_typewriter_idx = -1;
+static int8_t map_name_typewriter_idx;
 
 /** Draw the logo kanji text. */
 static void DrawLogoKanji(void);
@@ -89,6 +88,7 @@ void START(void) {
     RestoreDefaultAudio();
 
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
+
     ResetAllTypewriters();
 
     INIT_FONT(japanese_glyphs, PRINT_BKG);
@@ -110,19 +110,26 @@ void UPDATE(void) {
     // now draw romaji
     if (menu_checkpoint == MENU_LOGO_KANJI &&
         TypewriterIsDone(kanji_upper_typewriter_idx) &&
-        TypewriterIsDone(kanji_lower_typewriter_idx))
+        TypewriterIsDone(kanji_lower_typewriter_idx)) {
         DrawLogoRomaji();
+        menu_checkpoint = MENU_LOGO_ROMAJI;
+    }
 
     // romaji done
     // now draw map selector
     if (menu_checkpoint == MENU_LOGO_ROMAJI &&
-        TypewriterIsDone(romaji_typewriter_idx))
+        TypewriterIsDone(romaji_typewriter_idx)) {
         DrawOverlayMapSelector(MAP_SELECTOR_TILE_X, MAP_SELECTOR_TILE_Y);
+        menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
+    }
 
     // map selector done
     // now draw map labels
-    if (menu_checkpoint == MENU_OVERLAY_MAP_SELECTOR)
+    if (menu_checkpoint == MENU_OVERLAY_MAP_SELECTOR) {
         DrawMapLabels();
+        PlayMusic(mellow, 1);
+        menu_checkpoint = MENU_MAP_LABELS;
+    }
 
     // map labels done
     // now detect keypresses
@@ -160,8 +167,6 @@ static void DrawLogoKanji(void) {
     kanji_lower_typewriter_idx =
         DrawText(kanji_lower_label, 4, 2, TEXT_ANCHOR_LEFT, 10,
                  TEXT_PRIMARY_PALETTE_IDX);
-
-    menu_checkpoint = MENU_LOGO_KANJI;
 }
 
 static void DrawLogoRomaji(void) {
@@ -173,8 +178,6 @@ static void DrawLogoRomaji(void) {
 
     romaji_typewriter_idx = DrawText(romaji_label, 9, 2, TEXT_ANCHOR_LEFT, 8,
                                      TEXT_PRIMARY_PALETTE_IDX);
-
-    menu_checkpoint = MENU_LOGO_ROMAJI;
 }
 
 static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
@@ -212,10 +215,6 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
         }
 
     SWITCH_ROM(_saved_bank);
-
-    PlayMusic(mellow, 1);
-
-    menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
 }
 
 static void DrawMapLabels(void) {
@@ -225,7 +224,7 @@ static void DrawMapLabels(void) {
     ResetTypewriter(map_difficulty_typewriter_idx);
     ResetTypewriter(map_name_typewriter_idx);
 
-    static unsigned char empty_filler_label[13] = "            "; // 12 spaces
+    static unsigned char empty_filler_label[] = "            "; // 12 spaces
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
 
@@ -264,6 +263,4 @@ static void DrawMapLabels(void) {
 
     map_name_typewriter_idx = DrawText(map_title, 4, 10, TEXT_ANCHOR_LEFT, 3,
                                        TEXT_SECONDARY_PALETTE_IDX);
-
-    menu_checkpoint = MENU_MAP_LABELS;
 }

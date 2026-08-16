@@ -56,7 +56,7 @@ const Map maps[MAP_COUNT] = {
         .notes = map_isolation_notes,
         .note_count = MAP_ISOLATION_NOTE_COUNT,
         .notes_bank = (uint8_t)&__bank_map_isolation,
-        .frame_count = MAP_ISOLATION_FRAME_COUNT,
+        .frame_count = 60,
     },
 };
 

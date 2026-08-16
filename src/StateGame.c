@@ -97,6 +97,7 @@ void UPDATE(void) {
     // TODO: Show the win screen.
     if (current_frame > current_map->frame_count) {
         sfx_sound_cut();
+        SetState(StateEnd);
         return;
     }
 
