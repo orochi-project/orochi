@@ -1,4 +1,6 @@
 #include "Banks/SetAutoBank.h"
+
+#include "GameStore.h"
 #include "Keys.h"
 #include "MathUtils.h"
 #include "Notes.h"
@@ -80,8 +82,13 @@ static void CheckHold(HoldNoteData *note_data) {
     if (KEY_TICKED(J_A))
         note_data->flags |= FLAG_NOTE_HOLD_ARMED;
 
-    if ((note_data->flags & FLAG_NOTE_HOLD_ARMED) && passed_charging_stage)
+    if ((note_data->flags & FLAG_NOTE_HOLD_ARMED) && passed_charging_stage &&
+        !(note_data->flags & FLAG_NOTE_HOLDING)) {
+        note_data->frames_missed =
+            note_data->current_frame - note_data->charge_frames;
+
         note_data->flags |= FLAG_NOTE_HOLDING;
+    }
 
     if (KEY_RELEASED(J_A)) {
         note_data->flags &= ~FLAG_NOTE_HOLD_ARMED;
@@ -113,11 +120,8 @@ static void UpdateAnimation(HoldNoteData *note_data) {
                           note_data->hold_frames, NOTE_HOLD_FRAME_COUNT) +
             NOTE_CHARGE_FRAME_COUNT - 1;
         SetFrame(THIS, frame_idx);
-    } else if (note_data->flags & FLAG_NOTE_HOLD_LOCKED) {
-        SpriteManagerBringToFront(THIS);
+    } else if (note_data->flags & FLAG_NOTE_HOLD_LOCKED)
         SetFrame(THIS, NOTE_LOCKED_FRAME_IDX);
-    } else
-        ++note_data->frames_missed;
 }
 
 static void ApplyScanlineModifiers(HoldNoteData *note_data,
@@ -164,6 +168,14 @@ static bool HandleDestruction(HoldNoteData *note_data) {
     if (note_data->current_frame >
         note_data->charge_frames + note_data->hold_frames) {
         SpriteManagerRemoveSprite(THIS);
+
+        if (note_data->flags & FLAG_NOTE_HOLDING)
+            RegisterNoteHit(THIS->anim_frame == NOTE_CHARGE_FRAME_COUNT +
+                                                    NOTE_HOLD_FRAME_COUNT - 1
+                                ? HitPerfect
+                                : HitLate);
+        else
+            RegisterNoteHit(HitMiss);
 
         return true;
     }

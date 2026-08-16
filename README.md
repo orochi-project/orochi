@@ -1,7 +1,3 @@
-> [!NOTE]
-> This project is currently being rewritten using [CrossZGB](https://github.com/gbdk-2020/CrossZGB) due to some random (and probably extremely obscure) issues we've encountered upon along the way.
-> The result after the rewrite should be much cleaner.
-
 # Orochi
 
 A Cytus-inspired rhythm game for the Game Boy Color.
@@ -10,14 +6,25 @@ A Cytus-inspired rhythm game for the Game Boy Color.
 
 All credits for the songs in this game belong to the following artists:
 
+### Menu Loop
+
+Mellow by v81d: https://onlinesequencer.net/5719933.
+
+This is an original soundtrack (OST) of Orochi.
+
+_Licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0)._
+_You can use, copy, modify, distribute, and perform the work for both commercial and noncommercial purposes. No attribution needed._
+
+### Beatmap Songs
+
 1. [Komorebi](https://open.spotify.com/track/5IDaoVWnVNsXpiV9KOm9kI) by [Chasing Mirrors](https://open.spotify.com/artist/5rZuQbaBUI6qi8sB8tBcge)
 2. [Dream Flower](https://www.newgrounds.com/audio/listen/950723) by [KLYDIX](https://klydix.newgrounds.com)
 3. [Thirdboot](https://onlinesequencer.net/5544280) by [Syllue](https://onlinesequencer.net/members/76174)
 4. [Isolation](https://nighthawk22.com/music/isolation/isolation) by [NightHawk22](https://nighthawk22.com)
 
-## Entering the Development Environment
+## Development Environment
 
-### Native Linux with Nix Flake
+### Linux with Nix Flake
 
 To enter the development environment:
 
@@ -94,7 +101,7 @@ nix develop
 > sed -i 's/\r$//' flake.nix
 > ```
 
-#### Building and Running in the Nix Environment
+#### Building and Running
 
 To build the program in the Nix environment, first stage all files you want to build. Then, run the command:
 
@@ -107,3 +114,12 @@ To run the program using Gearboy after building:
 ```bash
 nix run
 ```
+
+## License
+
+Orochi is free software distributed under the **GNU General Public License, version 3.0 or later (GPL-3.0+).**
+
+You are free to use, modify, and share the software under the terms of the GPL.
+For full details, see the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
+
+All files in this repository are similarly licensed under the GPL unless otherwise stated.

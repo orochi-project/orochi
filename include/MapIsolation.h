@@ -4,11 +4,11 @@
 #include "gbdk/platform.h"
 
 /** The total frame count of the beatmap. */
-#define MAP_DREAM_FLOWER_FRAME_COUNT 13931
+#define MAP_ISOLATION_FRAME_COUNT 11610
 /** The number of notes in the beatmap. */
-#define MAP_DREAM_FLOWER_NOTE_COUNT 161
+#define MAP_ISOLATION_NOTE_COUNT 71
 
-BANKREF_EXTERN(map_dream_flower)
+BANKREF_EXTERN(map_isolation)
 
 /** The array of notes in the beatmap. */
-extern const Note map_dream_flower_notes[MAP_DREAM_FLOWER_NOTE_COUNT];
+extern const Note map_isolation_notes[MAP_ISOLATION_NOTE_COUNT];

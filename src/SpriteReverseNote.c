@@ -1,4 +1,6 @@
 #include "Banks/SetAutoBank.h"
+
+#include "GameStore.h"
 #include "Keys.h"
 #include "MathUtils.h"
 #include "Notes.h"
@@ -11,6 +13,12 @@
 
 /** The number of frames to allocate for the destruction timer. */
 #define DESTRUCTION_FRAMES 30
+
+/**
+ * The number of frames after the note is charged before which a hit is marked
+ * late.
+ */
+#define NOTE_HIT_LATE_THRESHOLD_FRAMES 5
 
 /**
  * Update the charge animation frame of the note.
@@ -78,14 +86,23 @@ static void UpdateChargeAnimation(ReverseNoteData *note_data) {
 }
 
 static void CheckPlayerClick(ReverseNoteData *note_data) {
+    if ((note_data->flags & FLAG_NOTE_HIT) ||
+        !CheckCollision(THIS, scanline_sprite) || !KEY_TICKED(J_B))
+        return;
+
     // If the note was not already clicked and was just ticked this frame, move
     // the note off-screen and flag the note as clicked to prevent any later
     // clicks on this note from registering.
-    if (!(note_data->flags & FLAG_NOTE_HIT) &&
-        CheckCollision(THIS, scanline_sprite) && KEY_TICKED(J_B)) {
-        THIS->y = 144; // move below visible screen
-        note_data->flags |= FLAG_NOTE_HIT;
-    }
+    if (note_data->current_frame >
+        note_data->charge_frames + NOTE_HIT_LATE_THRESHOLD_FRAMES)
+        RegisterNoteHit(HitLate);
+    else if (THIS->anim_frame == NOTE_FRAME_COUNT - 1)
+        RegisterNoteHit(HitPerfect);
+    else
+        RegisterNoteHit(HitEarly);
+
+    THIS->y = 144;
+    note_data->flags |= FLAG_NOTE_HIT;
 }
 
 static void ApplyScanlineModifiers(ReverseNoteData *note_data,
@@ -145,6 +162,9 @@ static bool HandleDestruction(ReverseNoteData *note_data) {
     else if (note_data->current_frame >=
              note_data->charge_frames + DESTRUCTION_FRAMES) {
         SpriteManagerRemoveSprite(THIS);
+
+        RegisterNoteHit(HitMiss);
+
         return true;
     }
 

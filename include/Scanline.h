@@ -4,14 +4,17 @@
 #include <stdbool.h>
 
 /** The starting x-position of the scanline. */
-#define SCANLINE_START_X 5
+#define SCANLINE_START_X (5 + 2)
 /** The starting y-position of the scanline. */
 #define SCANLINE_START_Y 8
 
 /** The x-position of the left boundary of the scanline. */
-#define SCANLINE_BOUND_LEFT_X 5
+#define SCANLINE_BOUND_LEFT_X (5 + 2)
 /** The x-position of the right boundary of the scanline. */
-#define SCANLINE_BOUND_RIGHT_X 147
+#define SCANLINE_BOUND_RIGHT_X (147 + 2)
+
+/** The width of the scanline collision box. */
+#define SCANLINE_COLLISION_WIDTH 4
 
 /** The starting velocity of the scanline. */
 #define SCANLINE_START_VELOCITY 1

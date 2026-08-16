@@ -1,14 +1,16 @@
-#include "Text.h"
+#include "Banks/SetAutoBank.h"
+
 #include "Print.h"
+#include "Text.h"
 #include <gbdk/platform.h>
 #include <string.h>
 
 /** Represents an instance of a typewriter. */
 typedef struct {
-    const unsigned char *text; ///< The final text to display.
-    uint8_t length;            ///< The total length of the text.
-    uint8_t tile_x;            ///< The tile x-position to start the text from.
-    uint8_t tile_y;            ///< The tile y-position to place the text on.
+    unsigned char text[MAX_TEXT_LENGTH]; ///< The final text to display.
+    uint8_t length;                      ///< The total length of the text.
+    uint8_t tile_x;        ///< The tile x-position to start the text from.
+    uint8_t tile_y;        ///< The tile y-position to place the text on.
     uint8_t delay;         ///< The interval over which each character appears.
     uint8_t timer;         ///< The mutable timer to track the progress of the
                            ///< typewriter instance.
@@ -23,7 +25,7 @@ static Typewriter typewriters[MAX_TYPEWRITERS];
 
 int8_t DrawText(const unsigned char *text, uint8_t tile_x, uint8_t tile_y,
                 TextAnchor text_anchor, uint8_t typewriter_delay,
-                uint8_t palette_idx) {
+                uint8_t palette_idx) BANKED {
     // find free typewriter idx
     uint8_t typewriter_idx = 0;
     while (typewriter_idx < MAX_TYPEWRITERS &&
@@ -34,6 +36,8 @@ int8_t DrawText(const unsigned char *text, uint8_t tile_x, uint8_t tile_y,
         return -1;
 
     uint8_t text_length = strlen((const char *)text);
+    if (text_length > MAX_TEXT_LENGTH)
+        text_length = MAX_TEXT_LENGTH;
 
     if (text_anchor == TEXT_ANCHOR_CENTER)
         tile_x -= text_length / 2;
@@ -41,7 +45,9 @@ int8_t DrawText(const unsigned char *text, uint8_t tile_x, uint8_t tile_y,
         tile_x -= text_length;
 
     if (typewriter_delay) {
-        typewriters[typewriter_idx].text = text;
+        for (uint8_t i = 0; i < text_length; ++i)
+            typewriters[typewriter_idx].text[i] = text[i];
+
         typewriters[typewriter_idx].length = text_length;
         typewriters[typewriter_idx].tile_x = tile_x;
         typewriters[typewriter_idx].tile_y = tile_y;
@@ -62,7 +68,7 @@ int8_t DrawText(const unsigned char *text, uint8_t tile_x, uint8_t tile_y,
     return typewriter_idx;
 }
 
-void UpdateTypewriter(void) {
+void UpdateTypewriter(void) BANKED {
     for (uint8_t typewriter_slot = 0; typewriter_slot < MAX_TYPEWRITERS;
          ++typewriter_slot) {
         Typewriter *typewriter = &typewriters[typewriter_slot];
@@ -99,7 +105,7 @@ void UpdateTypewriter(void) {
     }
 }
 
-bool TypewriterIsDone(uint8_t typewriter_idx) {
+bool TypewriterIsDone(uint8_t typewriter_idx) BANKED {
     if (typewriter_idx >= MAX_TYPEWRITERS)
         return true;
 
@@ -108,11 +114,16 @@ bool TypewriterIsDone(uint8_t typewriter_idx) {
                typewriters[typewriter_idx].length;
 }
 
-void ResetTypewriter(uint8_t typewriter_idx) {
+void ResetTypewriter(uint8_t typewriter_idx) BANKED {
     if (typewriter_idx >= MAX_TYPEWRITERS)
         return;
 
     typewriters[typewriter_idx].active = false;
     typewriters[typewriter_idx].character_idx = 0;
     typewriters[typewriter_idx].timer = 0;
+}
+
+void ResetAllTypewriters(void) BANKED {
+    for (uint8_t i = 0; i < MAX_TYPEWRITERS; ++i)
+        typewriters[i].active = false;
 }

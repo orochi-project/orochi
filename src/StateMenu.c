@@ -1,14 +1,15 @@
 #include "Banks/SetAutoBank.h"
-#include "GameAudio.h"
+
 #include "GameData.h"
+#include "GameStore.h"
 #include "Keys.h"
 #include "Maps.h"
+#include "Music.h"
 #include "Palette.h"
 #include "Print.h"
 #include "Scroll.h"
 #include "Text.h"
 #include "ZGBMain.h"
-#include "gb/gb.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -18,6 +19,8 @@ IMPORT_MAP(menu_map_selector);
 IMPORT_TILES(japanese_glyphs);
 IMPORT_TILES(yarara_font_primary);
 IMPORT_TILES(yarara_font_secondary);
+
+DECLARE_MUSIC(mellow);
 
 extern const palette_color_t menu_map_selector_palettes[4];
 
@@ -43,24 +46,24 @@ typedef struct {
     int8_t yarara_font_secondary_font_offset;
 } FontOffset;
 
+/** The current menu state. */
+static MenuCheckpoint menu_checkpoint;
+
 /** The saved menu font offsets. */
 static FontOffset font_offsets;
 
-/** The current menu state. */
-static MenuCheckpoint menu_checkpoint;
 /** The upper kanji typewriter index. */
 static int8_t kanji_upper_typewriter_idx;
 /** The lower kanji typewriter index. */
 static int8_t kanji_lower_typewriter_idx;
 /** The romaji typewriter index. */
 static int8_t romaji_typewriter_idx;
-
 /** The typewriter index for the map ID text. */
-static int8_t map_id_typewriter_idx = -1;
+static int8_t map_id_typewriter_idx;
 /** The typewriter index for the map difficulty text. */
-static int8_t map_difficulty_typewriter_idx = -1;
+static int8_t map_difficulty_typewriter_idx;
 /** The typewriter index for the map name text. */
-static int8_t map_name_typewriter_idx = -1;
+static int8_t map_name_typewriter_idx;
 
 /** Draw the logo kanji text. */
 static void DrawLogoKanji(void);
@@ -77,15 +80,16 @@ static void DrawMapLabels(void);
  * @param tile_x    The starting x-tile to draw the overlay.
  * @param tile_y    The starting y-tile to draw the overlay.
  */
-static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y);
+static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED;
 
 void START(void) {
     selected_map_idx = 0;
 
-    InitGameAudio();
+    RestoreDefaultAudio();
 
-    // scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
     InitScroll(BANK(menu_background), &menu_background, 0, 0);
+
+    ResetAllTypewriters();
 
     INIT_FONT(japanese_glyphs, PRINT_BKG);
     font_offsets.japanese_glyphs_font_offset = font_offset;
@@ -100,26 +104,32 @@ void START(void) {
 }
 
 void UPDATE(void) {
-    TickGameAudio();
     UpdateTypewriter();
 
     // kanji done
     // now draw romaji
     if (menu_checkpoint == MENU_LOGO_KANJI &&
         TypewriterIsDone(kanji_upper_typewriter_idx) &&
-        TypewriterIsDone(kanji_lower_typewriter_idx))
+        TypewriterIsDone(kanji_lower_typewriter_idx)) {
         DrawLogoRomaji();
+        menu_checkpoint = MENU_LOGO_ROMAJI;
+    }
 
     // romaji done
     // now draw map selector
     if (menu_checkpoint == MENU_LOGO_ROMAJI &&
-        TypewriterIsDone(romaji_typewriter_idx))
+        TypewriterIsDone(romaji_typewriter_idx)) {
         DrawOverlayMapSelector(MAP_SELECTOR_TILE_X, MAP_SELECTOR_TILE_Y);
+        menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
+    }
 
     // map selector done
     // now draw map labels
-    if (menu_checkpoint == MENU_OVERLAY_MAP_SELECTOR)
+    if (menu_checkpoint == MENU_OVERLAY_MAP_SELECTOR) {
         DrawMapLabels();
+        PlayMusic(mellow, 1);
+        menu_checkpoint = MENU_MAP_LABELS;
+    }
 
     // map labels done
     // now detect keypresses
@@ -148,14 +158,15 @@ static void DrawLogoKanji(void) {
 
     font_offset = font_offsets.japanese_glyphs_font_offset;
 
-    kanji_upper_typewriter_idx =
-        DrawText((const unsigned char *)"ABEF", 4, 1, TEXT_ANCHOR_LEFT, 10,
-                 TEXT_PRIMARY_PALETTE_IDX); // upper half of 大蛇
-    kanji_lower_typewriter_idx =
-        DrawText((const unsigned char *)"CDGH", 4, 2, TEXT_ANCHOR_LEFT, 10,
-                 TEXT_PRIMARY_PALETTE_IDX); // lower half of 大蛇
+    static unsigned char kanji_upper_label[] = "ABEF";
+    static unsigned char kanji_lower_label[] = "CDGH";
 
-    menu_checkpoint = MENU_LOGO_KANJI;
+    kanji_upper_typewriter_idx =
+        DrawText(kanji_upper_label, 4, 1, TEXT_ANCHOR_LEFT, 10,
+                 TEXT_PRIMARY_PALETTE_IDX);
+    kanji_lower_typewriter_idx =
+        DrawText(kanji_lower_label, 4, 2, TEXT_ANCHOR_LEFT, 10,
+                 TEXT_PRIMARY_PALETTE_IDX);
 }
 
 static void DrawLogoRomaji(void) {
@@ -163,14 +174,13 @@ static void DrawLogoRomaji(void) {
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
 
-    romaji_typewriter_idx =
-        DrawText((const unsigned char *)"OROCHI!", 9, 2, TEXT_ANCHOR_LEFT, 8,
-                 TEXT_PRIMARY_PALETTE_IDX);
+    static unsigned char romaji_label[] = "OROCHI!";
 
-    menu_checkpoint = MENU_LOGO_ROMAJI;
+    romaji_typewriter_idx = DrawText(romaji_label, 9, 2, TEXT_ANCHOR_LEFT, 8,
+                                     TEXT_PRIMARY_PALETTE_IDX);
 }
 
-static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
+static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
     wait_vbl_done();
 
     uint8_t _saved_bank = CURRENT_BANK;
@@ -205,8 +215,6 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) {
         }
 
     SWITCH_ROM(_saved_bank);
-
-    menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
 }
 
 static void DrawMapLabels(void) {
@@ -216,14 +224,13 @@ static void DrawMapLabels(void) {
     ResetTypewriter(map_difficulty_typewriter_idx);
     ResetTypewriter(map_name_typewriter_idx);
 
-    static unsigned char empty_filler[13];
-    memset(empty_filler, ' ', 12); // 12 spaces
-    empty_filler[12] = '\0';
+    static unsigned char empty_filler_label[] = "            "; // 12 spaces
 
     font_offset = font_offsets.yarara_font_primary_font_offset;
 
     // clear old map ID and difficulty
-    DrawText(empty_filler, 4, 7, TEXT_ANCHOR_LEFT, 0, TEXT_PRIMARY_PALETTE_IDX);
+    DrawText(empty_filler_label, 4, 7, TEXT_ANCHOR_LEFT, 0,
+             TEXT_PRIMARY_PALETTE_IDX);
 
     const Map *selected_map = &maps[selected_map_idx];
 
@@ -245,7 +252,7 @@ static void DrawMapLabels(void) {
     font_offset = font_offsets.yarara_font_secondary_font_offset;
 
     // clear old map name
-    DrawText(empty_filler, 4, 10, TEXT_ANCHOR_LEFT, 0,
+    DrawText(empty_filler_label, 4, 10, TEXT_ANCHOR_LEFT, 0,
              TEXT_SECONDARY_PALETTE_IDX);
 
     static unsigned char map_title[MAP_NAME_MAX_LENGTH];
@@ -256,8 +263,4 @@ static void DrawMapLabels(void) {
 
     map_name_typewriter_idx = DrawText(map_title, 4, 10, TEXT_ANCHOR_LEFT, 3,
                                        TEXT_SECONDARY_PALETTE_IDX);
-
-    PlayCurrentMapSong();
-
-    menu_checkpoint = MENU_MAP_LABELS;
 }

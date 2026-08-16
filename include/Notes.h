@@ -108,3 +108,11 @@ typedef struct {
     int8_t scanline_direction;
     uint8_t flags;
 } HoldNoteData;
+
+/** Types of note hits. */
+typedef enum {
+    HitPerfect, ///< A perfect hit.
+    HitEarly,   ///< An early hit.
+    HitLate,    ///< A late hit.
+    HitMiss,    ///< A missed note.
+} NoteHitGrade;

@@ -1,9 +1,11 @@
 #include "Banks/SetAutoBank.h"
+
 #include "Scanline.h"
 #include "SpriteManager.h"
 
 void START(void) {
     scanline_sprite = THIS;
+    THIS->coll_w = SCANLINE_COLLISION_WIDTH;
 
     ScanlineData *scanline_data = (ScanlineData *)THIS->custom_data;
     scanline_data->velocity = SCANLINE_START_VELOCITY;
