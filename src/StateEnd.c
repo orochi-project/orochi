@@ -103,9 +103,10 @@ static Sprite *DrawPlayerGradeSprite(void);
 static void DrawStatLabels(void);
 
 void START(void) {
-    RestoreDefaultAudio();
-
     selected_map = &maps[selected_map_idx];
+    end_checkpoint = END_TITLE_SYMBOLIC_ICON;
+
+    RestoreDefaultAudio();
 
     InitScroll(BANK(end_background), &end_background, 0, 0);
 

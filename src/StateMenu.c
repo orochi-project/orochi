@@ -79,6 +79,7 @@ static void DrawOverlayMapSelector(void) NONBANKED;
 
 void START(void) {
     selected_map_idx = 0;
+    menu_checkpoint = MENU_LOGO_KANJI;
 
     RestoreDefaultAudio();
 
