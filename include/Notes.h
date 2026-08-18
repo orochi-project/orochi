@@ -20,31 +20,6 @@
  */
 #define GRID_START_Y 20
 
-/** Whether or not the scanline's velocity has been changed to the note's speed
- * modifier. */
-#define FLAG_SCANLINE_SPEED_CHANGED 0x01
-/** Whether or not the scanline has already been snapped to the note's assigned
- * x-position and direction. */
-#define FLAG_SCANLINE_SNAPPED 0x02
-/** Whether or not the player successfully hit the note. */
-#define FLAG_NOTE_HIT 0x04
-/** Whether or not the note has been flagged for destruction after being missed.
- *
- * The note remains on screen for a short duration once this is set as a visual
- * cue that the note was missed. */
-#define FLAG_NOTE_PENDING_DESTRUCTION 0x8
-/** Whether or not the hold note is currently in its active holding state. */
-#define FLAG_NOTE_HOLDING 0x10
-/**
- * Whether or not the hold note's hold has ended.
- *
- * The hold note cannot re-enter an active hold when this flag is set.
- */
-#define FLAG_NOTE_HOLD_LOCKED 0x40
-/** Whether or not this note is armed to start holding as soon as it's able to.
- */
-#define FLAG_NOTE_HOLD_ARMED 0x80
-
 /** A note type. */
 typedef enum {
     TapLeft,  ///< A tap note directed to the left.
@@ -75,6 +50,34 @@ typedef struct {
                                ///< frame of the note.
 } Note;
 
+/** Bitfield flags shared by all note sprite data types. */
+typedef struct {
+    bool scanline_speed_changed : 1;   ///< Whether or not the scanline's
+                                       ///< velocity has been changed to the
+                                       ///< note's speed modifier.
+    bool scanline_snapped : 1;         ///< Whether or not the scanline has
+                                       ///< already been snapped to the note's
+                                       ///< assigned x-position and direction.
+    bool note_hit : 1;                 ///< Whether or not the player
+                                       ///< successfully hit the note.
+    bool note_pending_destruction : 1; ///< Whether or not the note has been
+                                       ///< flagged for destruction after
+                                       ///< being missed. The note remains
+                                       ///< on screen for a short duration
+                                       ///< once this is set as a visual cue
+                                       ///< that the note was missed.
+    bool note_holding : 1;             ///< Whether or not the hold note is
+                                       ///< currently in its active holding
+                                       ///< state.
+    bool note_hold_locked : 1;         ///< Whether or not the hold note's hold
+                                       ///< has ended. The hold note cannot
+                                       ///< re-enter an active hold when this
+                                       ///< flag is set.
+    bool note_hold_armed : 1;          ///< Whether or not this note is armed
+                                       ///< to start holding as soon as it's
+                                       ///< able to.
+} NoteFlags;
+
 /** Sprite custom data for tap notes. */
 typedef struct {
     uint8_t speed_modifier;
@@ -82,7 +85,7 @@ typedef struct {
     uint16_t current_frame;
     uint8_t scanline_x;
     int8_t scanline_direction;
-    uint8_t flags;
+    NoteFlags flags;
 } TapNoteData;
 
 /** Sprite custom data for reverse notes. */
@@ -92,7 +95,7 @@ typedef struct {
     uint16_t current_frame;
     uint8_t scanline_x;
     int8_t scanline_direction;
-    uint8_t flags;
+    NoteFlags flags;
 } ReverseNoteData;
 
 /** Sprite custom data for hold notes. */
@@ -104,7 +107,7 @@ typedef struct {
     uint8_t frames_missed;
     uint8_t scanline_x;
     int8_t scanline_direction;
-    uint8_t flags;
+    NoteFlags flags;
 } HoldNoteData;
 
 /** Types of note hits. */

@@ -55,7 +55,7 @@ static bool HandleDestruction(ReverseNoteData *note_data);
 void START(void) {
     ReverseNoteData *note_data = (ReverseNoteData *)THIS->custom_data;
     note_data->current_frame = 0;
-    note_data->flags = 0x00;
+    memset(&note_data->flags, 0, sizeof(NoteFlags));
 }
 
 void UPDATE(void) {
@@ -86,8 +86,10 @@ static void UpdateChargeAnimation(ReverseNoteData *note_data) {
 }
 
 static void CheckPlayerClick(ReverseNoteData *note_data) {
-    if ((note_data->flags & FLAG_NOTE_HIT) ||
-        !CheckCollision(THIS, scanline_sprite) || !KEY_TICKED(J_B))
+    // If the note was already hit, the scanline is not on the note, or the
+    // player is not pressing B, do not continue.
+    if (note_data->flags.note_hit || !CheckCollision(THIS, scanline_sprite) ||
+        !KEY_TICKED(J_B))
         return;
 
     // If the note was not already clicked and was just ticked this frame, move
@@ -102,7 +104,7 @@ static void CheckPlayerClick(ReverseNoteData *note_data) {
         RegisterNoteHit(HitEarly);
 
     THIS->y = 144;
-    note_data->flags |= FLAG_NOTE_HIT;
+    note_data->flags.note_hit = true;
 }
 
 static void ApplyScanlineModifiers(ReverseNoteData *note_data,
@@ -114,10 +116,10 @@ static void ApplyScanlineModifiers(ReverseNoteData *note_data,
 
     // If the scanline was not already snapped to the note's assigned scanline
     // x-position and direction, snap it now.
-    if (!(note_data->flags & FLAG_SCANLINE_SNAPPED)) {
+    if (!note_data->flags.scanline_snapped) {
         scanline_sprite->x = SCANLINE_BOUND_LEFT_X + note_data->scanline_x;
         scanline_data->velocity = -scanline_data->velocity; // reverse scanline
-        note_data->flags |= FLAG_SCANLINE_SNAPPED;
+        note_data->flags.scanline_snapped = true;
     }
 
     // If we did not already change the velocity of the scanline to the note's
@@ -125,11 +127,10 @@ static void ApplyScanlineModifiers(ReverseNoteData *note_data,
     // If the note's speed modifier is 0 (or anything falsy), do not modify the
     // scanline's velocity.
     // The scanline's direction stays the same.
-    if (!(note_data->flags & FLAG_SCANLINE_SPEED_CHANGED) &&
-        note_data->speed_modifier) {
+    if (!note_data->flags.scanline_speed_changed && note_data->speed_modifier) {
         scanline_data->velocity =
             SIGN(scanline_data->velocity) * note_data->speed_modifier;
-        note_data->flags |= FLAG_SCANLINE_SPEED_CHANGED;
+        note_data->flags.scanline_speed_changed = true;
     }
 }
 
@@ -139,15 +140,15 @@ static bool HandleDestruction(ReverseNoteData *note_data) {
 
     // If the note was clicked, destroy the note.
     // TODO: Handle early clicks and misses.
-    if (note_data->flags & FLAG_NOTE_HIT) {
+    if (note_data->flags.note_hit) {
         SpriteManagerRemoveSprite(THIS);
         return true;
     }
 
     // If the note was not clicked, but it has passed the charging stage, flag
     // the note as pending destruction.
-    if (!(note_data->flags & FLAG_NOTE_PENDING_DESTRUCTION))
-        note_data->flags |= FLAG_NOTE_PENDING_DESTRUCTION;
+    if (!note_data->flags.note_pending_destruction)
+        note_data->flags.note_pending_destruction = true;
     // If the note has passed its charging stage, is already flagged as pending,
     // and has passed the destruction-pending stage, destroy the note.
     else if (note_data->current_frame >=
