@@ -3,6 +3,7 @@
 #include "MapIsolation.h"
 #include "MapKomorebi.h"
 #include "Music.h"
+#include "MapThirdboot.h"
 
 DECLARE_MUSIC(komorebi);
 DECLARE_MUSIC(dream_flower);
@@ -41,10 +42,10 @@ const Map maps[MAP_COUNT] = {
         .song = &thirdboot_uge,
         .song_bank = (uint8_t)&__bank_thirdboot_uge,
         .audio_skip_interval = 145,
-        .notes = map_dream_flower_notes,
-        .note_count = MAP_DREAM_FLOWER_NOTE_COUNT,
-        .notes_bank = (uint8_t)&__bank_map_dream_flower,
-        .frame_count = MAP_DREAM_FLOWER_FRAME_COUNT,
+        .notes = map_thirdboot_notes,
+        .note_count = MAP_THIRDBOOT_NOTE_COUNT,
+        .notes_bank = (uint8_t)&__bank_map_thirdboot,
+        .frame_count = MAP_THIRDBOOT_FRAME_COUNT,
     },
     {
         .id = 3,
