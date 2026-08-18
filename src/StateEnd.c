@@ -2,6 +2,7 @@
 
 #include "GameData.h"
 #include "GameStore.h"
+#include "Keys.h"
 #include "Maps.h"
 #include "Music.h"
 #include "Palette.h"
@@ -9,7 +10,6 @@
 #include "SpriteManager.h"
 #include "Text.h"
 #include "ZGBMain.h"
-#include "gb/gb.h"
 #include "gbdk/platform.h"
 #include "stdlib.h"
 #include <string.h>
@@ -157,11 +157,18 @@ void UPDATE(void) {
     }
 
     // player grade sprite done
-    // now draw player accuracy label
+    // now stat labels
     if (end_checkpoint == END_PLAYER_GRADE_SPRITE) {
         DrawStatLabels();
         end_checkpoint = END_STAT_LABELS;
     }
+
+    // stat labels done
+    // now detect keypresses
+    if (end_checkpoint == END_STAT_LABELS &&
+        TypewriterIsDone(final_accuracy_typewriter_idx) &&
+        TypewriterIsDone(note_count_typewriter_idx) && KEY_TICKED(J_START))
+        SetState(StateMenu);
 }
 
 static void DrawTitleSymbolicIcon(void) {
