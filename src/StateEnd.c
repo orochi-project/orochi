@@ -119,6 +119,8 @@ void START(void) {
     INIT_FONT(mangrove_font_primary, PRINT_BKG);
     font_offsets.mangrove_font_primary_font_offset = font_offset;
 
+    ResetAllTypewriters();
+
     DrawTitleSymbolicIcon();
 }
 
