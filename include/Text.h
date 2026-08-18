@@ -9,7 +9,7 @@
 /** The palette index that points to the secondary text color. */
 #define TEXT_SECONDARY_PALETTE_IDX 2
 /** The palette index that points to the utility text colors. */
-#define TEXT_UTILITY_PALETTE_IDX 3
+#define TEXT_ALTERNATE_PALETTE_IDX 3
 
 /** The maximum number of concurrent typewriters allowed. */
 #define MAX_TYPEWRITERS 8

@@ -17,13 +17,13 @@
 
 IMPORT_MAP(map_background);
 
-IMPORT_TILES(mangrove_font_utility);
+IMPORT_TILES(mangrove_font_alternate);
 
 #define HIT_GRADE_LABEL_DURATION 120;
 
 /** Represents the stored font offsets for all loaded game fonts. */
 typedef struct {
-    int8_t mangrove_font_utility_font_offset;
+    int8_t mangrove_font_alternate_font_offset;
 } FontOffset;
 
 /** The saved game font offsets. */
@@ -65,6 +65,7 @@ void START(void) {
     current_frame = 0;
     next_note_idx = 0;
     hit_grade_label_timer = 0;
+    last_accuracy_percent = 100;
     last_drawn_accuracy_percent = 255;
 
     ResetAccuracy();
@@ -73,8 +74,8 @@ void START(void) {
 
     InitScroll(BANK(map_background), &map_background, 0, 0);
 
-    INIT_FONT(mangrove_font_utility, PRINT_BKG);
-    font_offsets.mangrove_font_utility_font_offset = font_offset;
+    INIT_FONT(mangrove_font_alternate, PRINT_BKG);
+    font_offsets.mangrove_font_alternate_font_offset = font_offset;
 
     SpriteManagerAdd(SpriteScanline, SCANLINE_START_X, SCANLINE_START_Y);
 
@@ -195,7 +196,7 @@ static Sprite *DrawNote(const Note *note) {
 }
 
 static void DrawHUD(void) {
-    font_offset = font_offsets.mangrove_font_utility_font_offset;
+    font_offset = font_offsets.mangrove_font_alternate_font_offset;
 
     static unsigned char grade_filler_label[] = "       "; // 7 spaces
     static unsigned char accuracy_icon_label[] = "!";
@@ -203,7 +204,7 @@ static void DrawHUD(void) {
 
     if (should_draw_hit_grade_label) {
         DrawText(grade_filler_label, 19, 16, TEXT_ANCHOR_RIGHT, 0,
-                 TEXT_UTILITY_PALETTE_IDX);
+                 TEXT_ALTERNATE_PALETTE_IDX);
 
         static unsigned char grade_label[8];
 
@@ -224,7 +225,7 @@ static void DrawHUD(void) {
         }
 
         DrawText((const unsigned char *)grade_label, 19, 16, TEXT_ANCHOR_RIGHT,
-                 1, TEXT_UTILITY_PALETTE_IDX);
+                 1, TEXT_ALTERNATE_PALETTE_IDX);
 
         should_draw_hit_grade_label = false;
         hit_grade_label_timer = HIT_GRADE_LABEL_DURATION;
@@ -233,27 +234,26 @@ static void DrawHUD(void) {
     if (hit_grade_label_timer > 0)
         if (--hit_grade_label_timer == 0)
             DrawText(grade_filler_label, 19, 16, TEXT_ANCHOR_RIGHT, 1,
-                     TEXT_UTILITY_PALETTE_IDX);
+                     TEXT_ALTERNATE_PALETTE_IDX);
 
     // draw the accuracy icon once on the first frame
     if (current_frame == 1)
         DrawText(accuracy_icon_label, 1, 16, TEXT_ANCHOR_LEFT, 0,
-                 TEXT_UTILITY_PALETTE_IDX);
+                 TEXT_ALTERNATE_PALETTE_IDX);
 
-    uint8_t accuracy_percent = GetAccuracyPercent();
-    if (accuracy_percent != last_drawn_accuracy_percent) {
+    if (last_accuracy_percent != last_drawn_accuracy_percent) {
         char accuracy_label[5];
-        itoa(accuracy_percent, accuracy_label, 10);
+        itoa(last_accuracy_percent, accuracy_label, 10);
 
         const uint8_t digit_count = strlen(accuracy_label);
         accuracy_label[digit_count] = '('; // % symbol
         accuracy_label[digit_count + 1] = '\0';
 
         DrawText(accuracy_filler_label, 2, 16, TEXT_ANCHOR_LEFT, 0,
-                 TEXT_UTILITY_PALETTE_IDX);
+                 TEXT_ALTERNATE_PALETTE_IDX);
         DrawText((const unsigned char *)accuracy_label, 2, 16, TEXT_ANCHOR_LEFT,
-                 0, TEXT_UTILITY_PALETTE_IDX);
+                 0, TEXT_ALTERNATE_PALETTE_IDX);
 
-        last_drawn_accuracy_percent = accuracy_percent;
+        last_drawn_accuracy_percent = last_accuracy_percent;
     }
 }

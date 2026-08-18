@@ -15,3 +15,11 @@ extern NoteHitGrade latest_hit_grade;
 
 /** Whether or not the HUD hit grade label should be redrawn. */
 extern bool should_draw_hit_grade_label;
+
+/** The last recorded accuracy percent. */
+extern uint8_t last_accuracy_percent;
+
+/** Sprite custom data for the letter grade icon. */
+typedef struct {
+    unsigned char letter; ///< The letter to display.
+} LetterGradeData;

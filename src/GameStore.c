@@ -9,9 +9,6 @@
 /** The counter to track when one audio tick must be skipped. */
 static uint8_t skip_counter = 0;
 
-/** The last recorded accuracy percent. */
-static uint8_t last_accuracy_percent = 100;
-
 /** The accuracy weight per hit grade (perfect, early, late, and miss). */
 static const uint8_t grade_weight[4] = {100, 50, 50, 0};
 
@@ -88,5 +85,3 @@ void ResetAccuracy(void) BANKED {
     total_graded_notes = 0;
     last_accuracy_percent = 100;
 }
-
-uint8_t GetAccuracyPercent(void) BANKED { return last_accuracy_percent; }

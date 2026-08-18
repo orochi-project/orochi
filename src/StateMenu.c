@@ -16,7 +16,7 @@
 IMPORT_MAP(menu_background);
 IMPORT_MAP(menu_map_selector);
 
-IMPORT_TILES(japanese_glyphs);
+IMPORT_TILES(symbolic_font_primary);
 IMPORT_TILES(yarara_font_primary);
 IMPORT_TILES(yarara_font_secondary);
 
@@ -41,7 +41,7 @@ typedef enum {
 
 /** Represents the stored font offsets for all loaded menu fonts. */
 typedef struct {
-    int8_t japanese_glyphs_font_offset;
+    int8_t symbolic_font_primary_font_offset;
     int8_t yarara_font_primary_font_offset;
     int8_t yarara_font_secondary_font_offset;
 } FontOffset;
@@ -74,13 +74,8 @@ static void DrawLogoRomaji(void);
 /** Draw the map labels. */
 static void DrawMapLabels(void);
 
-/**
- * Draw the map selector overlay.
- *
- * @param tile_x    The starting x-tile to draw the overlay.
- * @param tile_y    The starting y-tile to draw the overlay.
- */
-static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED;
+/** Draw the map selector overlay. */
+static void DrawOverlayMapSelector(void) NONBANKED;
 
 void START(void) {
     selected_map_idx = 0;
@@ -91,8 +86,8 @@ void START(void) {
 
     ResetAllTypewriters();
 
-    INIT_FONT(japanese_glyphs, PRINT_BKG);
-    font_offsets.japanese_glyphs_font_offset = font_offset;
+    INIT_FONT(symbolic_font_primary, PRINT_BKG);
+    font_offsets.symbolic_font_primary_font_offset = font_offset;
 
     INIT_FONT(yarara_font_primary, PRINT_BKG);
     font_offsets.yarara_font_primary_font_offset = font_offset;
@@ -119,7 +114,7 @@ void UPDATE(void) {
     // now draw map selector
     if (menu_checkpoint == MENU_LOGO_ROMAJI &&
         TypewriterIsDone(romaji_typewriter_idx)) {
-        DrawOverlayMapSelector(MAP_SELECTOR_TILE_X, MAP_SELECTOR_TILE_Y);
+        DrawOverlayMapSelector();
         menu_checkpoint = MENU_OVERLAY_MAP_SELECTOR;
     }
 
@@ -156,7 +151,7 @@ void UPDATE(void) {
 static void DrawLogoKanji(void) {
     wait_vbl_done();
 
-    font_offset = font_offsets.japanese_glyphs_font_offset;
+    font_offset = font_offsets.symbolic_font_primary_font_offset;
 
     static unsigned char kanji_upper_label[] = "ABEF";
     static unsigned char kanji_lower_label[] = "CDGH";
@@ -180,7 +175,7 @@ static void DrawLogoRomaji(void) {
                                      TEXT_PRIMARY_PALETTE_IDX);
 }
 
-static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
+static void DrawOverlayMapSelector(void) NONBANKED {
     wait_vbl_done();
 
     uint8_t _saved_bank = CURRENT_BANK;
@@ -207,7 +202,8 @@ static void DrawOverlayMapSelector(uint8_t tile_x, uint8_t tile_y) NONBANKED {
             uint8_t patched_attributes =
                 (*attributes & ~0x07) | MAP_SELECTOR_PALETTE_IDX;
 
-            UpdateMapTile(TARGET_BKG, tile_x + x, tile_y + y, map_offset, *data,
+            UpdateMapTile(TARGET_BKG, MAP_SELECTOR_TILE_X + x,
+                          MAP_SELECTOR_TILE_Y + y, map_offset, *data,
                           &patched_attributes);
 
             ++data;
