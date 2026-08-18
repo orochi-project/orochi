@@ -6,7 +6,7 @@
 /** The total frame count of the beatmap. */
 #define MAP_THIRDBOOT_FRAME_COUNT 8707
 /** The number of notes in the beatmap. */
-#define MAP_THIRDBOOT_NOTE_COUNT 159
+#define MAP_THIRDBOOT_NOTE_COUNT 216
 
 BANKREF_EXTERN(map_thirdboot)
 
