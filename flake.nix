@@ -20,6 +20,7 @@
 
         nativeBuildInputs = [
           crosszgb
+          (pkgs.python3.withPackages (ps: [ps.pillow]))
         ];
 
         buildPhase = ''
@@ -32,7 +33,7 @@
 
         installPhase = ''
           mkdir -p $out
-          cp build/orochi.gb $out/
+          cp obj/Release/gbc/rom.gbc $out/OROCHI.gbc
         '';
       };
 

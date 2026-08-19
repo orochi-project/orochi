@@ -6,7 +6,7 @@
 bin/
 obj/
 build/
-result/
+result
 
 # Single-user tooling configurations
 bear.yml
