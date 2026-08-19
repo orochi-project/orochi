@@ -20,6 +20,9 @@
  */
 #define GRID_START_Y 20
 
+/** The total number of frames in the note charge animation. */
+#define NOTE_CHARGE_FRAME_COUNT 5
+
 /** A note type. */
 typedef enum {
     TapLeft,  ///< A tap note directed to the left.

@@ -2579,10 +2579,10 @@ const Note map_isolation_notes[MAP_ISOLATION_NOTE_COUNT] = {
         .type = TapRight,
         .grid_idx = 12,
         .speed_modifier = 0,
-        .appear_frame = 6512,
+        .appear_frame = 6514,
         .charge_frames = 90,
         .hold_frames = 0,
-        .scanline_x = 78,
+        .scanline_x = 80,
         .scanline_direction = 1,
     },
     {

@@ -9,9 +9,6 @@
 #include "SpriteManager.h"
 #include <stdbool.h>
 
-/** The total number of frames for this note. */
-#define NOTE_CHARGE_FRAME_COUNT 5
-
 /** The number of frames to allocate for the destruction timer. */
 #define DESTRUCTION_FRAMES 30
 
@@ -98,6 +95,11 @@ static void CheckPlayerClick(TapNoteData *note_data) {
         is_mirrored ? KEY_TICKED(J_DOWN) : KEY_TICKED(J_UP);
 
     if (!correct_key_pressed)
+        return;
+
+    // If the note is not the highest-priority note in its column, do not
+    // register the click yet.
+    if (!IsBestMomentaryNoteForColumn(THIS, NOTE_HIT_LATE_THRESHOLD_FRAMES))
         return;
 
     // If the note was hit past the lateness threshold, it was hit late.

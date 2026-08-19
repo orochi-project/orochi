@@ -8,9 +8,6 @@
 #include "SpriteManager.h"
 #include <stdbool.h>
 
-/** The total number of frames for this note. */
-#define NOTE_FRAME_COUNT 5
-
 /** The number of frames to allocate for the destruction timer. */
 #define DESTRUCTION_FRAMES 30
 
@@ -80,7 +77,7 @@ static void UpdateChargeAnimation(ReverseNoteData *note_data) {
     if (note_data->current_frame <= note_data->charge_frames) {
         uint16_t frame_idx =
             DIV_MUL_ROUND(note_data->current_frame, note_data->charge_frames,
-                          NOTE_FRAME_COUNT - 1);
+                          NOTE_CHARGE_FRAME_COUNT - 1);
         SetFrame(THIS, frame_idx);
     }
 }
@@ -92,13 +89,18 @@ static void CheckPlayerClick(ReverseNoteData *note_data) {
         !KEY_TICKED(J_B))
         return;
 
+    // If the note is not the highest-priority note in its column, do not
+    // register the click yet.
+    if (!IsBestMomentaryNoteForColumn(THIS, NOTE_HIT_LATE_THRESHOLD_FRAMES))
+        return;
+
     // If the note was not already clicked and was just ticked this frame, move
     // the note off-screen and flag the note as clicked to prevent any later
     // clicks on this note from registering.
     if (note_data->current_frame >
         note_data->charge_frames + NOTE_HIT_LATE_THRESHOLD_FRAMES)
         RegisterNoteHit(HitLate);
-    else if (THIS->anim_frame == NOTE_FRAME_COUNT - 1)
+    else if (THIS->anim_frame == NOTE_CHARGE_FRAME_COUNT - 1)
         RegisterNoteHit(HitPerfect);
     else
         RegisterNoteHit(HitEarly);

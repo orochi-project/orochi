@@ -5,6 +5,13 @@
 #include "GameStore.h"
 #include "Maps.h"
 #include "Music.h"
+#include "Notes.h"
+#include "Scanline.h"
+#include "Sprite.h"
+#include "SpriteManager.h"
+#include "ZGBMain.h"
+#include "gb/gb.h"
+#include <stdint.h>
 
 /** The counter to track when one audio tick must be skipped. */
 static uint8_t skip_counter = 0;
@@ -84,4 +91,80 @@ void ResetAccuracy(void) BANKED {
     total_weighted_score = 0;
     total_graded_notes = 0;
     last_accuracy_percent = 100;
+}
+
+bool IsBestMomentaryNoteForColumn(Sprite *note_sprite,
+                                  uint8_t late_threshold) BANKED {
+    uint16_t note_priority = GetNotePriority(note_sprite, late_threshold);
+    uint8_t active_note_count =
+        sprite_manager_updatables[0]; // first element is the count
+
+    for (uint8_t i = 1; i <= active_note_count; ++i) {
+        uint8_t sprite_idx = sprite_manager_updatables[i];
+        Sprite *sprite = sprite_manager_sprites[sprite_idx];
+        // only check notes that are different and are active
+        if (!sprite || sprite == note_sprite)
+            continue;
+
+        // not applicable
+        if (sprite->type != SpriteTapNoteHorizontal &&
+            sprite->type != SpriteTapNoteVertical &&
+            sprite->type != SpriteReverseNote)
+            continue;
+
+        // must be on same column
+        if (sprite->x != note_sprite->x)
+            continue;
+
+        bool other_was_hit = false;
+        if (sprite->type == SpriteReverseNote)
+            other_was_hit =
+                ((ReverseNoteData *)sprite->custom_data)->flags.note_hit;
+        else
+            other_was_hit =
+                ((TapNoteData *)sprite->custom_data)->flags.note_hit;
+
+        if (!other_was_hit && !CheckCollision(sprite, scanline_sprite))
+            continue;
+
+        uint16_t sprite_priority = GetNotePriority(sprite, late_threshold);
+
+        if (sprite_priority < note_priority)
+            return false;
+    }
+
+    // no notes in this column exist that are better candidates to be hit
+    return true;
+}
+
+bool IsBestHoldNoteForColumn(Sprite *note_sprite) BANKED {
+    uint16_t note_priority = GetNotePriority(note_sprite, 0);
+    uint8_t active_note_count = sprite_manager_updatables[0];
+
+    for (uint8_t i = 1; i <= active_note_count; ++i) {
+        uint8_t sprite_idx = sprite_manager_updatables[i];
+        Sprite *sprite = sprite_manager_sprites[sprite_idx];
+        // only check notes that are different and are active
+        if (!sprite || sprite == note_sprite)
+            continue;
+
+        if (sprite->type != SpriteHoldNote)
+            continue;
+        if (sprite->x != note_sprite->x)
+            continue;
+
+        HoldNoteData *sprite_data = (HoldNoteData *)sprite->custom_data;
+
+        // already holding, or locked
+        if (sprite_data->flags.note_holding ||
+            sprite_data->flags.note_hold_locked)
+            continue;
+
+        uint16_t sprite_priority = GetNotePriority(sprite, 0);
+
+        if (sprite_priority < note_priority)
+            return false;
+    }
+
+    return true;
 }

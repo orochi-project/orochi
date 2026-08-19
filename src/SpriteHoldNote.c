@@ -8,12 +8,8 @@
 #include "SpriteManager.h"
 #include <stdbool.h>
 
-/** The total number of charge frames for this note. */
-#define NOTE_CHARGE_FRAME_COUNT 5
-
 /** The total number of hold frames for this note. */
 #define NOTE_HOLD_FRAME_COUNT 4
-
 /** The index of the locked frame for this note. */
 #define NOTE_LOCKED_FRAME_IDX 9
 
@@ -81,7 +77,7 @@ static void CheckHold(HoldNoteData *note_data) {
         note_data->current_frame >= note_data->charge_frames;
 
     // If the user is holding A, mark the note as hold-armed.
-    if (KEY_TICKED(J_A))
+    if (KEY_TICKED(J_A) && IsBestHoldNoteForColumn(THIS))
         note_data->flags.note_hold_armed = true;
 
     // If the note is hold-armed, is done charging, but is not marked as holding
