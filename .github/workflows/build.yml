@@ -27,7 +27,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: orochi-gbc
+          name: OROCHI
           path: OROCHI.gbc
 
       - name: Attach to release
