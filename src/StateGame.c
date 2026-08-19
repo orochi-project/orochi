@@ -66,6 +66,7 @@ void START(void) {
     next_note_idx = 0;
     hit_grade_label_timer = 0;
     last_accuracy_percent = 100;
+    notes_hit_count = 0;
     last_drawn_accuracy_percent = 255;
 
     ResetAccuracy();
@@ -211,12 +212,15 @@ static void DrawHUD(void) {
         switch (latest_hit_grade) {
         case HitPerfect:
             strcpy((char *)grade_label, "PERFECT");
+            ++notes_hit_count;
             break;
         case HitEarly:
             strcpy((char *)grade_label, "EARLY");
+            ++notes_hit_count;
             break;
         case HitLate:
             strcpy((char *)grade_label, "LATE");
+            ++notes_hit_count;
             break;
         case HitMiss:
         default:

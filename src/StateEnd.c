@@ -297,8 +297,8 @@ static void DrawStatLabels(void) {
         DrawText((const unsigned char *)final_accuracy_label, 7, 8,
                  TEXT_ANCHOR_LEFT, 3, TEXT_PRIMARY_PALETTE_IDX);
 
-    static char note_count_label[7] = ")";                    // note symbol
-    itoa(selected_map->note_count, note_count_label + 1, 10); // note count
+    static char note_count_label[7] = ")";           // note symbol
+    itoa(notes_hit_count, note_count_label + 1, 10); // note count
     const uint8_t note_count_text_length = strlen(note_count_label);
     note_count_label[note_count_text_length] = '-';
     note_count_label[note_count_text_length + 1] = '\0';

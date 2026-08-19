@@ -19,6 +19,9 @@ extern bool should_draw_hit_grade_label;
 /** The last recorded accuracy percent. */
 extern uint8_t last_accuracy_percent;
 
+/** The number of notes the player hit perfectly, early, late. */
+extern uint16_t notes_hit_count;
+
 /** Sprite custom data for the letter grade icon. */
 typedef struct {
     unsigned char letter; ///< The letter to display.
