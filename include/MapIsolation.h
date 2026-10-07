@@ -6,7 +6,7 @@
 /** The total frame count of the beatmap. */
 #define MAP_ISOLATION_FRAME_COUNT 11610
 /** The number of notes in the beatmap. */
-#define MAP_ISOLATION_NOTE_COUNT 469
+#define MAP_ISOLATION_NOTE_COUNT 426
 
 BANKREF_EXTERN(map_isolation)
 
