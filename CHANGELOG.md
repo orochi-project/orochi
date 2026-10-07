@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/orochi-project/orochi/compare/v0.1.0...v0.2.0) (2026-10-07)
+
+
+### Features
+
+* nerf level 4 ([34f9649](https://github.com/orochi-project/orochi/commit/34f964936ea63b44b31e285a1f92a32c534a198c))
+
+
+### Miscellaneous Chores
+
+* bump flake to 0.2.0 ([aeb4a42](https://github.com/orochi-project/orochi/commit/aeb4a42201ef1b38969e2818fa026d1642e89095))
+
 ## 0.1.0 (2026-08-19)
 
 
